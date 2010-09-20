@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+    
+    http://www.apache.org/licenses/LICENSE-2.0
+    
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.apache.sling</groupId>
+        <artifactId>sling</artifactId>
+        <version>9</version>
+        <relativePath>../../../parent/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>org.apache.sling.osgi.installer</artifactId>
+    <version>3.0.1-SNAPSHOT</version>
+    <packaging>bundle</packaging>
+
+    <name>Apache Sling OSGi Installer</name>
+    <description> 
+        Provides services to install OSGi bundles and configurations
+        by supplying input streams and dictionaries.
+    </description>
+
+    <scm>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/sling/trunk/installer/osgi/installer</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/sling/trunk/installer/osgi/installer</developerConnection>
+        <url>http://svn.apache.org/viewvc/sling/installer/osgi/installer</url>
+    </scm>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Bundle-Activator>
+							org.apache.sling.osgi.installer.impl.Activator
+                        </Bundle-Activator>
+						<Export-Package>
+							org.apache.sling.osgi.installer;version=3.0.0
+                        </Export-Package>
+						<Private-Package>org.apache.sling.osgi.installer.impl.*</Private-Package>
+                        <Embed-Dependency>
+                            org.apache.felix.configadmin;inline="org/apache/felix/cm/file/ConfigurationHandler.*"
+                        </Embed-Dependency>
+					</instructions>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<systemProperties>
+						<property>
+							<name>osgi.installer.base.dir</name>
+							<value>${project.build.directory}</value>
+						</property>
+                        <property>
+                            <name>osgi.installer.pom.version</name>
+                            <value>${pom.version}</value>
+                        </property>
+					</systemProperties>
+				</configuration>
+			</plugin>
+			<plugin>
+				<!-- Create dummy test bundles -->
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>testbundle-1.0</id>
+						<phase>compile</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks name="Create a test bundle">
+                                <jar destfile="${project.build.directory}/${project.artifactId}-${project.version}-testbundle-1.0.jar">
+                                    <fileset dir="${project.build.directory}/classes">
+                                        <include name="META-INF/**" />
+                                    </fileset>
+                                    <manifest>
+                                        <attribute name="Manifest-Version" value="2" />
+                                        <attribute name="Bundle-Name" value="OSGi installer test bundle" />
+                                        <attribute name="Bundle-SymbolicName" value="osgi-installer-testbundle" />
+                                        <attribute name="Bundle-Version" value="1.0.4" />
+                                    </manifest>
+                                </jar>
+                            </tasks>
+                        </configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+      <!-- We use a class from the config admin implementation to read config files -->
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.configadmin</artifactId>
+            <version>1.2.8</version>
+            <scope>provided</scope>
+        </dependency>
+      <!-- Basic dependencies for Unit Tests -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+        </dependency>
+    </dependencies>
+</project>
