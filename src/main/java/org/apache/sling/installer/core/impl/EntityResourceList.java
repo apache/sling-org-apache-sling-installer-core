@@ -373,7 +373,20 @@ public class EntityResourceList implements Serializable, TaskResourceGroup {
                 if ( rr.getURL().equals(r.getURL()) ) {
                     if ( RegisteredResourceImpl.isSameResource((RegisteredResourceImpl)rr, r) ) {
                         if ( !rr.getDigest().equals(r.getDigest()) ) {
-                            // same resource but different digest, we need to remove the file
+                            // same resource but different digest, we need to to update the file
+                            LOGGER.debug("Updating resource with due to different digest: {}", r);
+                            try {
+								InternalResource intRes = InternalResource.create(r.getScheme(), 
+										new InstallableResource(r.getEntityId(), 
+												r.getInputStream(), 
+												r.getDictionary(),
+												r.getDigest(), 
+												r.getType(), 
+												r.getPriority()));
+								((RegisteredResourceImpl)rr).update(intRes);
+                            } catch (IOException e) {
+								LOGGER.error("Failed to update resource with different digest: {}", r);
+							}
                             LOGGER.debug("Cleanup duplicate resource: {}", r);
                             this.cleanup(r);
                         }
