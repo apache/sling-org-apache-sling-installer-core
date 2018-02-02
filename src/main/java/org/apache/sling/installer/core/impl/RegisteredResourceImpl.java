@@ -69,7 +69,7 @@ public class RegisteredResourceImpl
 	private final Dictionary<String, Object> dictionary;
 
 	/** Additional attributes. */
-	private final Map<String, Object> attributes = new HashMap<String, Object>();
+	private final Map<String, Object> attributes = new HashMap<>();
 
 	private String dataUri;
 
@@ -250,12 +250,16 @@ public class RegisteredResourceImpl
 	    return this.dataFile;
 	}
 
-	/**
+    public String getDataURI() {
+        return this.dataUri;
+    }
+
+    /**
 	 * Remove the data file
 	 */
 	private void removeDataFile() {
         if ( this.dataFile != null && this.dataFile.exists() ) {
-            dataFile.delete();
+            this.dataFile.delete();
         }
         this.dataUri = null;
 	}
@@ -528,7 +532,7 @@ public class RegisteredResourceImpl
     @Override
     public void setTemporaryAttribute(final String key, final Object value) {
         if ( this.temporaryAttributes == null ) {
-            this.temporaryAttributes = new HashMap<String, Object>();
+            this.temporaryAttributes = new HashMap<>();
         }
         if ( value == null ) {
             this.temporaryAttributes.remove(key);
@@ -598,11 +602,23 @@ public class RegisteredResourceImpl
                 if ( this.dictionary != null ) {
                     this.dictionary.remove(InstallableResource.RESOURCE_URI_HINT);
                 }
-                if ( this.dataFile != null ) {
-                    this.removeDataFile();
-                }
+                this.removeDataFile();
                 this.dataFile = rsrc.getPrivateCopyOfFile();
                 FileDataStore.SHARED.updateDigestCache(this.url, this.dataFile, this.digest);
+            }
+        }
+    }
+
+    /**
+     * Update the resource uri - if provided.
+     */
+    public void updateResourceUri(final String updatedResourceUri) {
+        if ( updatedResourceUri != null ) {
+            FileDataStore.SHARED.removeFromDigestCache(this.url, this.digest);
+            this.removeDataFile();
+            this.dataUri = updatedResourceUri;
+            if ( this.dictionary != null ) {
+                this.dictionary.put(InstallableResource.RESOURCE_URI_HINT, updatedResourceUri);
             }
         }
     }

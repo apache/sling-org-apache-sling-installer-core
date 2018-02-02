@@ -56,7 +56,7 @@ public class EntityResourceList implements Serializable, TaskResourceGroup {
     private static final Logger LOGGER = LoggerFactory.getLogger(EntityResourceList.class);
 
     /** The list of registered resources for this entity. */
-    private final List<RegisteredResourceImpl> resources = new ArrayList<RegisteredResourceImpl>();
+    private final List<RegisteredResourceImpl> resources = new ArrayList<>();
 
     /** Alias for this id. */
     private String alias;
@@ -353,7 +353,7 @@ public class EntityResourceList implements Serializable, TaskResourceGroup {
     public Collection<RegisteredResourceImpl> getResources() {
         final List<RegisteredResourceImpl> list;
         synchronized ( lock ) {
-            list = new ArrayList<RegisteredResourceImpl>(this.resources);
+            list = new ArrayList<>(this.resources);
         }
         Collections.sort(list);
         return list;
@@ -372,21 +372,22 @@ public class EntityResourceList implements Serializable, TaskResourceGroup {
                 final TaskResource rr = taskIter.next();
                 if ( rr.getURL().equals(r.getURL()) ) {
                     if ( RegisteredResourceImpl.isSameResource((RegisteredResourceImpl)rr, r) ) {
+                        // this check is questionable. The digest could be the same and
+                        // the resource URI might have changed nevertheless
                         if ( !rr.getDigest().equals(r.getDigest()) ) {
-                            // same resource but different digest, we need to to update the file
-                            LOGGER.debug("Updating resource with due to different digest: {}", r);
-                            try {
-								InternalResource intRes = InternalResource.create(r.getScheme(), 
-										new InstallableResource(r.getEntityId(), 
-												r.getInputStream(), 
-												r.getDictionary(),
-												r.getDigest(), 
-												r.getType(), 
-												r.getPriority()));
-								((RegisteredResourceImpl)rr).update(intRes);
-                            } catch (IOException e) {
-								LOGGER.error("Failed to update resource with different digest: {}", r);
-							}
+                            // same resource but different digest
+                            LOGGER.debug("Updating resource due to different digests: {} vs {}", r, rr);
+
+                            // we need to check the resource URI if provided (aka getDataURI())
+                            // if different that one needs to be updated
+                            // this update only handles the following cases:
+                            // 1. existing resource has a resource URI and new resource has a resource URI
+                            // 2. existing resource has a file and new resource has a resource URI
+                            // It doesn't necessarily handle:
+                            // 1. existing resource has a resource URI and new resource has a file
+                            // 2. existing resource has a file and new resource has a file
+                            ((RegisteredResourceImpl)rr).updateResourceUri(r.getDataURI());
+
                             LOGGER.debug("Cleanup duplicate resource: {}", r);
                             this.cleanup(r);
                         }
@@ -455,7 +456,7 @@ public class EntityResourceList implements Serializable, TaskResourceGroup {
         synchronized ( lock ) {
             Collections.sort(this.resources);
             boolean startNewCycle = false;
-            final List<TaskResource> toDelete = new ArrayList<TaskResource>();
+            final List<TaskResource> toDelete = new ArrayList<>();
             boolean first = true;
             for(final TaskResource r : resources) {
                 if ( r.getState() == ResourceState.UNINSTALLED || (!first && r.getState() == ResourceState.UNINSTALL) ) {
@@ -468,7 +469,7 @@ public class EntityResourceList implements Serializable, TaskResourceGroup {
                 // Avoid resources.remove(r) as the resource might have
                 // changed since it was added, which causes it to compare()
                 // differently and trip the TreeSet.remove() search.
-                final Set<RegisteredResourceImpl> copy = new HashSet<RegisteredResourceImpl>(resources);
+                final Set<RegisteredResourceImpl> copy = new HashSet<>(resources);
                 for(final RegisteredResource r : toDelete) {
                     copy.remove(r);
                     this.cleanup(r);
