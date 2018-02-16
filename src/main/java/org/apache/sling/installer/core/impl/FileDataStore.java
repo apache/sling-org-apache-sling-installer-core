@@ -29,6 +29,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.MessageDigest;
+import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -46,7 +47,7 @@ import org.slf4j.LoggerFactory;
 public class FileDataStore {
 
     private static final Logger log = LoggerFactory.getLogger(FileDataStore.class);
-    
+
     /**
      * The name of the bundle context property defining the location for the
      * installer files (value is "sling.installer.dir").
@@ -159,7 +160,7 @@ public class FileDataStore {
                 final CacheEntry storedDigest = this.digestCache.get(url);
                 if ( storedDigest != null && storedDigest.digest.equals(digest) ) {
                     log.debug(
-                            "File {} with digest {} found, returning {}", 
+                            "File {} with digest {} found, returning {}",
                             url, digest, safePath(storedDigest.file));
                     return storedDigest.file;
                 }
@@ -280,12 +281,7 @@ public class FileDataStore {
             }
             for(final String key : sortedKeys) {
                 oos.writeObject(key);
-                final Object val = data.get(key);
-                if ( val instanceof Number ) {
-                    oos.writeObject(String.valueOf(val));
-                } else {
-                    oos.writeObject(val);
-                }
+                writeValue(data.get(key), oos);
             }
 
             oos.flush();
@@ -299,7 +295,21 @@ public class FileDataStore {
             return result;
         }
     }
-    
+
+    private static void writeValue(final Object val, final ObjectOutputStream oos) throws IOException {
+        if ( val instanceof Number ) {
+            writeValue(String.valueOf(val), oos);
+        } else if ( val instanceof Collection ) {
+            for (Object o : (Collection<?>) val) {
+                writeValue(o, oos);
+            }
+        } else if ( val instanceof String ) {
+            oos.writeUTF((String) val);
+        } else {
+            oos.writeObject(val);
+        }
+    }
+
     private static final String safePath(File f) {
         return f == null ? null : f.getAbsolutePath();
     }
