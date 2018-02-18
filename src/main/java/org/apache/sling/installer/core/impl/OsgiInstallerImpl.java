@@ -675,8 +675,9 @@ implements OsgiInstaller, ResourceChangeListener, RetryHandler, InfoProvider, Ru
                 try {
                     result = factory.createTask(rrg);
                 } catch ( final Exception fatal ) {
-                    logger.error("An exception occured while creating a task for " + rrg.getActiveResource()+ ". Resource will be ignored.", fatal);
-                    result = new ChangeStateTask(rrg, ResourceState.IGNORED);
+                    String message = MessageFormat.format("An exception occured while creating a task for {0}. Resource will be ignored: {1}", rrg.getActiveResource(), fatal.getMessage());
+                    logger.error(message, fatal);
+                    result = new ChangeStateTask(rrg, ResourceState.IGNORED, message);
                 }
                 if ( result != null ) {
                     break;

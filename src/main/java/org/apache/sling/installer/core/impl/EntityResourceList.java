@@ -285,7 +285,7 @@ public class EntityResourceList implements Serializable, TaskResourceGroup {
                         while ( i.hasNext() ) {
                             final TaskResource rsrc = i.next();
                             if ( rsrc.getState() == ResourceState.INSTALLED ) {
-                                ((RegisteredResourceImpl)rsrc).setState(ResourceState.INSTALL, null);
+                                ((RegisteredResourceImpl)rsrc).setState(ResourceState.INSTALL, "Another resource with the same entity id but a higher version or priority or digest found (in that order, the latter only in case the version is a SNAPSHOT)!");
                             }
                         }
                     }
@@ -413,7 +413,12 @@ public class EntityResourceList implements Serializable, TaskResourceGroup {
             }
             if ( add ) {
                 resources.add(r);
+                // make sure that in case the newly added resource is not the first one the state is saying why it is in mode install
                 Collections.sort(this.resources);
+                if (r != resources.get(0)) {
+                    // don't change actual state but indicate why resource is not considered for subsequent runs (not on first position)
+                    r.setState(ResourceState.INSTALL, "Another resource with the same entity id but a higher version or priority or digest found (in that order, the latter only in case the version is a SNAPSHOT)!");
+                }
             }
         }
     }
