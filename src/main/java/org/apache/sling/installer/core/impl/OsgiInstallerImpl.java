@@ -373,8 +373,8 @@ implements OsgiInstaller, ResourceChangeListener, RetryHandler, InfoProvider, Ru
                     final InternalResource rr = InternalResource.create(scheme, r);
                     createdResources.add(rr);
                     logger.debug("Registering new resource: {}", rr);
-                } catch (final IOException ioe) {
-                    logger.warn("Cannot create InternalResource (resource will be ignored):" + r, ioe);
+                } catch (final Exception e) {
+                    logger.warn("Cannot create InternalResource (resource will be ignored):" + r, e);
                 }
             }
         }
