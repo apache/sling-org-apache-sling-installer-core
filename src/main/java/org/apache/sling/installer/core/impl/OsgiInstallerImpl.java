@@ -151,7 +151,7 @@ implements OsgiInstaller, ResourceChangeListener, RetryHandler, InfoProvider, Ru
     /**
      *  Constructor
      *
-     *  Most of the initialization is defered to the background thread
+     *  Most of the initialization is deferred to the background thread
      */
     public OsgiInstallerImpl(final BundleContext ctx) {
         this.ctx = ctx;
