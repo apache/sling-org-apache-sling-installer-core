@@ -59,6 +59,10 @@
                             org.apache.felix.configadmin;inline="org/apache/felix/cm/file/ConfigurationHandler.*",
                             org.apache.sling.commons.osgi;inline="org/apache/sling/commons/osgi/ManifestHeader*.*|org/apache/sling/commons/osgi/PropertiesUtil.*|org/apache/sling/commons/osgi/SortingServiceTracker.*"
                         </Embed-Dependency>
+            <Provide-Capability><![CDATA[
+              osgi.service;objectClass:List<String>="org.apache.sling.installer.api.OsgiInstaller,org.apache.sling.installer.api.ResourceChangeListener,org.apache.sling.installer.api.info.InfoProvider,org.apache.sling.installer.api.tasks.RetryHandler",
+              osgi.service;objectClass:List<String>="org.apache.sling.installer.api.event.InstallationListener,org.apache.sling.installer.api.jmx.InstallerMBean"
+            ]]></Provide-Capability>
 					</instructions>
 				</configuration>
 			</plugin>
