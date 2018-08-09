@@ -31,7 +31,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.CheckForNull;
+import org.jetbrains.annotations.Nullable;
 
 import org.apache.sling.installer.api.InstallableResource;
 import org.apache.sling.installer.api.tasks.ResourceState;
@@ -679,7 +679,7 @@ public class RegisteredResourceImpl
     }
 
     @Override
-    @CheckForNull
+    @Nullable
     public String getError() {
         return error;
     }

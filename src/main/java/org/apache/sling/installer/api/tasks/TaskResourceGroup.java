@@ -18,7 +18,7 @@
  */
 package org.apache.sling.installer.api.tasks;
 
-import javax.annotation.CheckForNull;
+import org.jetbrains.annotations.Nullable;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -83,6 +83,6 @@ public interface TaskResourceGroup {
      * @return The alias or {@code null}.
      * @since 1.1
      */
-    @CheckForNull
+    @Nullable
     String getAlias();
 }

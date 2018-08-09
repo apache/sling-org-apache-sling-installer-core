@@ -18,7 +18,7 @@
  */
 package org.apache.sling.installer.api.info;
 
-import javax.annotation.CheckForNull;
+import org.jetbrains.annotations.Nullable;
 
 import org.apache.sling.installer.api.tasks.InstallTask;
 import org.apache.sling.installer.api.tasks.RegisteredResource;
@@ -48,14 +48,14 @@ public interface Resource extends RegisteredResource {
      *
      * @return an error string or {@code null}
      */
-    @CheckForNull
+    @Nullable
     String getError();
 
     /**
      * Return the version of the artifact.
      * @return The version of the artifact or <code>null</code>
      */
-    @CheckForNull
+    @Nullable
     Version getVersion();
 
     /**
@@ -72,6 +72,6 @@ public interface Resource extends RegisteredResource {
      * @param key The name of the attribute
      * @return The value of the attribute or <code>null</code>
      */
-    @CheckForNull
+    @Nullable
     Object getAttribute(String key);
 }

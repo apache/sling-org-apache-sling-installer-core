@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
-import javax.annotation.CheckForNull;
+import org.jetbrains.annotations.Nullable;
 
 import org.apache.sling.installer.api.InstallableResource;
 import org.apache.sling.installer.api.tasks.ResourceState;
@@ -152,7 +152,7 @@ public class MockBundleResource implements TaskResource, Comparable<MockBundleRe
     }
 
     @Override
-    @CheckForNull
+    @Nullable
     public String getError() {
         return null;
     }

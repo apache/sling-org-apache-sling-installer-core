@@ -39,7 +39,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.annotation.CheckForNull;
+import org.jetbrains.annotations.Nullable;
 
 import org.apache.sling.commons.osgi.PropertiesUtil;
 import org.apache.sling.installer.api.InstallableResource;
@@ -1479,7 +1479,7 @@ implements OsgiInstaller, ResourceChangeListener, RetryHandler, InfoProvider, Ru
                             }
 
                             @Override
-                            @CheckForNull
+                            @Nullable
                             public String getError() {
                                 return tr.getError();
                             }

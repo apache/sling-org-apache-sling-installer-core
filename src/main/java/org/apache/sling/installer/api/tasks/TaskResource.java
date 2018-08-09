@@ -18,7 +18,7 @@
  */
 package org.apache.sling.installer.api.tasks;
 
-import javax.annotation.CheckForNull;
+import org.jetbrains.annotations.Nullable;
 
 import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.framework.Version;
@@ -53,7 +53,7 @@ public interface TaskResource extends RegisteredResource {
      * @param key The name of the attribute
      * @return The value of the attribute or <code>null</code>
      */
-    @CheckForNull
+    @Nullable
     Object getAttribute(String key);
 
     /**
@@ -74,7 +74,7 @@ public interface TaskResource extends RegisteredResource {
      *
      * @return an error string or {@code null}
      */
-    @CheckForNull
+    @Nullable
     String getError();
 
     /**
@@ -82,7 +82,7 @@ public interface TaskResource extends RegisteredResource {
      * @param key The name of the attribute
      * @return The value of the attribute or <code>null</code>
      */
-    @CheckForNull
+    @Nullable
     Object getTemporaryAttribute(String key);
 
     /**
@@ -97,6 +97,6 @@ public interface TaskResource extends RegisteredResource {
      * @return The version of the artifact or <code>null</code>
      * @since 1.2
      */
-    @CheckForNull
+    @Nullable
     Version getVersion();
 }
