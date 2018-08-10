@@ -98,10 +98,10 @@ public class InternalResourceTest {
             "}";
         final InstallableResource rsrc = new InstallableResource("my.config.json",
                 new ByteArrayInputStream(JSONConfig.getBytes("UTF-8")), null, "digest",
-                InstallableResource.TYPE_FILE, null);
+                null, null);
 
         final InternalResource ir = InternalResource.create(SCHEME, rsrc);
-        assertEquals(InstallableResource.TYPE_FILE, ir.getType());
+        assertEquals(InstallableResource.TYPE_PROPERTIES, ir.getType());
         assertNull(ir.getInputStream());
         assertNotNull(ir.getDictionary());
         assertEquals(3, ir.getDictionary().size());
