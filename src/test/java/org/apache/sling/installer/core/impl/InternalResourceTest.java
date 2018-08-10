@@ -22,6 +22,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -47,7 +48,7 @@ public class InternalResourceTest {
     }
 
     private Dictionary<String, Object> getSimpleDict() {
-        final Hashtable<String, Object> dict = new Hashtable<String, Object>();
+        final Hashtable<String, Object> dict = new Hashtable<>();
         dict.put("a", "a");
         dict.put("b", 2);
 
@@ -87,5 +88,25 @@ public class InternalResourceTest {
             assertNotNull(ir.getDigest());
             assertEquals(InstallableResource.DEFAULT_PRIORITY, ir.getPriority());
         }
+    }
+
+    @Test public void testJSONForConfigurations() throws IOException {
+        final String JSONConfig = "{\n" +
+            "\"service.ranking:Integer\" : \"20\",\n" +
+            "\"string.prop\" : \"hello world\",\n" +
+            "\"value\" : true\n" +
+            "}";
+        final InstallableResource rsrc = new InstallableResource("my.config.json",
+                new ByteArrayInputStream(JSONConfig.getBytes("UTF-8")), null, "digest",
+                InstallableResource.TYPE_FILE, null);
+
+        final InternalResource ir = InternalResource.create(SCHEME, rsrc);
+        assertEquals(InstallableResource.TYPE_FILE, ir.getType());
+        assertNull(ir.getInputStream());
+        assertNotNull(ir.getDictionary());
+        assertEquals(3, ir.getDictionary().size());
+        assertEquals(20, ir.getDictionary().get("service.ranking"));
+        assertEquals("hello world", ir.getDictionary().get("string.prop"));
+        assertEquals(Boolean.TRUE, ir.getDictionary().get("value"));
     }
 }

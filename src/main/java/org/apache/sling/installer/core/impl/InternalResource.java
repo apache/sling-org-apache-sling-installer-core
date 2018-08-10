@@ -19,16 +19,22 @@
 package org.apache.sling.installer.core.impl;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
+import java.net.URL;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
 
 import org.apache.felix.cm.file.ConfigurationHandler;
+import org.apache.felix.configurator.impl.json.JSONUtil;
+import org.apache.felix.configurator.impl.json.TypeConverter;
+import org.apache.felix.configurator.impl.model.ConfigurationFile;
 import org.apache.sling.installer.api.InstallableResource;
 
 /**
@@ -95,7 +101,7 @@ public class InternalResource extends InstallableResource {
              (InstallableResource.TYPE_PROPERTIES.equals(type) ||
               ((type == null || InstallableResource.TYPE_FILE.equals(type)) && isConfigExtension(resource.getId())))) {
             try {
-                dict = readDictionary(is, getExtension(resource.getId()));
+                dict = readDictionary(is, scheme, resource.getId());
             } catch (final IOException ioe) {
                 throw (IOException)new IOException("Unable to read dictionary from input stream: " + resource.getId()).initCause(ioe);
             }
@@ -179,7 +185,7 @@ public class InternalResource extends InstallableResource {
             return null;
         }
 
-        final Dictionary<String, Object> result = new Hashtable<String, Object>();
+        final Dictionary<String, Object> result = new Hashtable<>();
         final Enumeration<String> e = d.keys();
         while(e.hasMoreElements()) {
             final String key = e.nextElement();
@@ -214,63 +220,124 @@ public class InternalResource extends InstallableResource {
      * We use the same logic as Apache Felix FileInstall here:
      * - *.cfg files are treated as property files
      * - *.config files are handled by the Apache Felix ConfigAdmin file reader
+     * And all *.json files are read using code from Apache Felix Configurator
      * @param is
      * @param extension
      * @throws IOException
      */
     private static Dictionary<String, Object> readDictionary(
-            final InputStream is, final String extension)
+            final InputStream is, final String scheme, final String id)
     throws IOException {
-        final Hashtable<String, Object> ht = new Hashtable<String, Object>();
-        final BufferedInputStream in = new BufferedInputStream(is);
-        try {
-            if ( !extension.equals("config") ) {
-                final Properties p = new Properties();
-                in.mark(1);
-                boolean isXml = in.read() == '<';
-                in.reset();
-                if (isXml) {
-                    p.loadFromXML(in);
-                } else {
-                    p.load(in);
-                }
-                final Enumeration<Object> i = p.keys();
-                while ( i.hasMoreElements() ) {
-                    final Object key = i.nextElement();
-                    ht.put(key.toString(), p.get(key));
-                }
+        final String extension = getExtension(id);
+        if ( "json".equals(extension) ) {
+            final String name = scheme.concat(":").concat(id);
+            String configId;
+            int pos = id.lastIndexOf('/');
+            if ( pos == -1 ) {
+                configId = id;
             } else {
-                // check for initial comment line
-                in.mark(256);
-                final int firstChar = in.read();
-                if ( firstChar == '#' ) {
-                    int b;
-                    while ((b = in.read()) != '\n' ) {
-                        if ( b == -1 ) {
-                            throw new IOException("Unable to read configuration.");
+                configId = id.substring(pos + 1);
+            }
+            pos = configId.indexOf('-');
+            if ( pos != -1 ) {
+                configId = configId.substring(0, pos).concat("~").concat(configId.substring(pos+1));
+            }
+            if ( isConfigExtension(configId) ) {
+                configId = configId.substring(0, configId.lastIndexOf('.'));
+            }
+            final TypeConverter typeConverter = new TypeConverter(null);
+            final JSONUtil.Report report = new JSONUtil.Report();
+
+            // read from input stream
+            final String contents;
+            try(final BufferedReader buf = new BufferedReader(
+                        new InputStreamReader(is, "UTF-8"))) {
+
+                final StringBuilder sb = new StringBuilder();
+
+                sb.append("{ \"");
+                sb.append(configId);
+                sb.append("\" : ");
+                String line;
+
+                while ((line = buf.readLine()) != null) {
+                    sb.append(line);
+                    sb.append('\n');
+                }
+                sb.append("}");
+
+                contents = sb.toString();
+            }
+
+            final URL url = new URL("file://" + configId);
+
+            final ConfigurationFile config = JSONUtil.readJSON(typeConverter, name, url, 0, contents, report);
+
+            if ( !report.errors.isEmpty() || !report.warnings.isEmpty() ) {
+                final StringBuilder builder = new StringBuilder();
+                builder.append("Errors in configuration:");
+                for(final String w : report.warnings) {
+                    builder.append("\n");
+                    builder.append(w);
+                }
+                for(final String e : report.errors) {
+                    builder.append("\n");
+                    builder.append(e);
+                }
+                throw new IOException(builder.toString());
+            }
+            return config.getConfigurations().get(0).getProperties();
+
+        } else {
+            final Hashtable<String, Object> ht = new Hashtable<>();
+
+            try (final BufferedInputStream in = new BufferedInputStream(is)) {
+
+                if ("config".equals(extension) ) {
+                    // check for initial comment line
+                    in.mark(256);
+                    final int firstChar = in.read();
+                    if ( firstChar == '#' ) {
+                        int b;
+                        while ((b = in.read()) != '\n' ) {
+                            if ( b == -1 ) {
+                                throw new IOException("Unable to read configuration.");
+                            }
                         }
+                    } else {
+                        in.reset();
+                    }
+                    @SuppressWarnings("unchecked")
+                    final Dictionary<String, Object> config = ConfigurationHandler.read(in);
+                    final Enumeration<String> i = config.keys();
+                    while ( i.hasMoreElements() ) {
+                        final String key = i.nextElement();
+                        ht.put(key, config.get(key));
                     }
                 } else {
+                    final Properties p = new Properties();
+                    in.mark(1);
+                    boolean isXml = in.read() == '<';
                     in.reset();
-                }
-                @SuppressWarnings("unchecked")
-                final Dictionary<String, Object> config = ConfigurationHandler.read(in);
-                final Enumeration<String> i = config.keys();
-                while ( i.hasMoreElements() ) {
-                    final String key = i.nextElement();
-                    ht.put(key, config.get(key));
+                    if (isXml) {
+                        p.loadFromXML(in);
+                    } else {
+                        p.load(in);
+                    }
+                    final Enumeration<Object> i = p.keys();
+                    while ( i.hasMoreElements() ) {
+                        final Object key = i.nextElement();
+                        ht.put(key.toString(), p.get(key));
+                    }
                 }
             }
-        } finally {
-            try { in.close(); } catch (IOException ignore) {}
+            return ht;
         }
-
-        return ht;
     }
 
     private static boolean isConfigExtension(final String url) {
         final String ext = getExtension(url);
-        return "config".equals(ext) || "properties".equals(ext) || "cfg".equals(ext);
+        return "config".equals(ext) || "properties".equals(ext) || "cfg".equals(ext) || "json".equals(ext);
     }
 
     /**

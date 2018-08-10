@@ -55,14 +55,19 @@
 						<Bundle-Activator>
 							org.apache.sling.installer.core.impl.Activator
                         </Bundle-Activator>
+                        <Conditional-Package>
+                            org.apache.felix.configurator.impl.json,
+                            org.apache.felix.configurator.impl.model                            
+                        </Conditional-Package>
                         <Embed-Dependency>
+                            geronimo-json_1.0_spec,johnzon-core,org.apache.felix.converter,
                             org.apache.felix.configadmin;inline="org/apache/felix/cm/file/ConfigurationHandler.*",
                             org.apache.sling.commons.osgi;inline="org/apache/sling/commons/osgi/ManifestHeader*.*|org/apache/sling/commons/osgi/PropertiesUtil.*|org/apache/sling/commons/osgi/SortingServiceTracker.*"
                         </Embed-Dependency>
-            <Provide-Capability><![CDATA[
-              osgi.service;objectClass:List<String>="org.apache.sling.installer.api.OsgiInstaller,org.apache.sling.installer.api.ResourceChangeListener,org.apache.sling.installer.api.info.InfoProvider,org.apache.sling.installer.api.tasks.RetryHandler",
-              osgi.service;objectClass:List<String>="org.apache.sling.installer.api.event.InstallationListener,org.apache.sling.installer.api.jmx.InstallerMBean"
-            ]]></Provide-Capability>
+                        <Provide-Capability><![CDATA[
+                            osgi.service;objectClass:List<String>="org.apache.sling.installer.api.OsgiInstaller,org.apache.sling.installer.api.ResourceChangeListener,org.apache.sling.installer.api.info.InfoProvider,org.apache.sling.installer.api.tasks.RetryHandler",
+                            osgi.service;objectClass:List<String>="org.apache.sling.installer.api.event.InstallationListener,org.apache.sling.installer.api.jmx.InstallerMBean"
+                        ]]></Provide-Capability>
 					</instructions>
 				</configuration>
 			</plugin>
@@ -148,6 +153,31 @@
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.configadmin</artifactId>
             <version>1.8.12</version>
+            <scope>provided</scope>
+        </dependency>
+      <!--  We use classes from the configurator, json api and converter to read JSON config files -->
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.configurator</artifactId>
+            <version>1.0.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.converter</artifactId>
+            <version>1.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-json_1.0_spec</artifactId>
+            <version>1.0-alpha-1</version>
+            <scope>provided</scope> 
+        </dependency>
+        <dependency>
+            <groupId>org.apache.johnzon</groupId>
+            <artifactId>johnzon-core</artifactId>
+            <version>1.0.0</version>
             <scope>provided</scope>
         </dependency>
       <!-- Basic dependencies for Unit Tests -->
