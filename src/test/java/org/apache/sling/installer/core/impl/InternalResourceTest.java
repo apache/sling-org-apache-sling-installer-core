@@ -96,7 +96,7 @@ public class InternalResourceTest {
             "\"string.prop\" : \"hello world\",\n" +
             "\"value\" : true\n" +
             "}";
-        final InstallableResource rsrc = new InstallableResource("my.config.json",
+        final InstallableResource rsrc = new InstallableResource("my.component.cfg.json",
                 new ByteArrayInputStream(JSONConfig.getBytes("UTF-8")), null, "digest",
                 null, null);
 

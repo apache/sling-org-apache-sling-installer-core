@@ -26,9 +26,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.felix.cm.file.ConfigurationHandler;
@@ -228,8 +230,7 @@ public class InternalResource extends InstallableResource {
     private static Dictionary<String, Object> readDictionary(
             final InputStream is, final String scheme, final String id)
     throws IOException {
-        final String extension = getExtension(id);
-        if ( "json".equals(extension) ) {
+        if ( id.endsWith(".cfg.json") ) {
             final String name = scheme.concat(":").concat(id);
             String configId;
             int pos = id.lastIndexOf('/');
@@ -242,9 +243,8 @@ public class InternalResource extends InstallableResource {
             if ( pos != -1 ) {
                 configId = configId.substring(0, pos).concat("~").concat(configId.substring(pos+1));
             }
-            if ( isConfigExtension(configId) ) {
-                configId = configId.substring(0, configId.lastIndexOf('.'));
-            }
+            configId = removeConfigExtension(configId);
+
             final TypeConverter typeConverter = new TypeConverter(null);
             final JSONUtil.Report report = new JSONUtil.Report();
 
@@ -293,7 +293,7 @@ public class InternalResource extends InstallableResource {
 
             try (final BufferedInputStream in = new BufferedInputStream(is)) {
 
-                if ("config".equals(extension) ) {
+                if (id.endsWith(".config") ) {
                     // check for initial comment line
                     in.mark(256);
                     final int firstChar = in.read();
@@ -335,16 +335,22 @@ public class InternalResource extends InstallableResource {
         }
     }
 
+    private static final List<String> EXTENSIONS = Arrays.asList(".config", ".properties", ".cfg", ".cfg.json");
     private static boolean isConfigExtension(final String url) {
-        final String ext = getExtension(url);
-        return "config".equals(ext) || "properties".equals(ext) || "cfg".equals(ext) || "json".equals(ext);
+        for(final String ext : EXTENSIONS) {
+            if ( url.endsWith(ext) ) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    /**
-     * Compute the extension
-     */
-    private static String getExtension(String url) {
-        final int pos = url.lastIndexOf('.');
-        return (pos < 0 ? "" : url.substring(pos+1));
+    private static String removeConfigExtension(final String id) {
+        for(final String ext : EXTENSIONS) {
+            if ( id.endsWith(ext) ) {
+                return id.substring(0, id.length() - ext.length());
+            }
+        }
+        return id;
     }
 }
