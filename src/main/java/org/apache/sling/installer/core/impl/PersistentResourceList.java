@@ -310,7 +310,7 @@ public class PersistentResourceList {
         // remove resource from unknown list
         this.untransformedResources.remove(resource);
         try {
-            Set<String> entityIds = new HashSet<String>();
+            Set<String> entityIds = new HashSet<>();
             for(int i=0; i<result.length; i++) {
                 // check the result
                 final TransformationResult tr = result[i];
@@ -344,5 +344,13 @@ public class PersistentResourceList {
      */
     public boolean isSpecialEntityId(final String id) {
         return RESTART_ACTIVE_BUNDLES_ENTITY_ID.equals(id);
+    }
+
+    public void update(final String oldId, final String newAlias, final String newId) {
+        final EntityResourceList list = this.data.remove(oldId);
+        if (list != null ) {
+            list.update(newAlias, newId);
+            this.data.put(newId, list);
+        }
     }
 }

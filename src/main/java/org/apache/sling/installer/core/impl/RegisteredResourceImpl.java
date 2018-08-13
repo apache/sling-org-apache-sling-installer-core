@@ -31,12 +31,11 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jetbrains.annotations.Nullable;
-
 import org.apache.sling.installer.api.InstallableResource;
 import org.apache.sling.installer.api.tasks.ResourceState;
 import org.apache.sling.installer.api.tasks.TaskResource;
 import org.apache.sling.installer.api.tasks.TransformationResult;
+import org.jetbrains.annotations.Nullable;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Version;
@@ -682,5 +681,9 @@ public class RegisteredResourceImpl
     @Nullable
     public String getError() {
         return error;
+    }
+
+    public void updateEntityId(final String newId) {
+        this.entity = newId;
     }
 }

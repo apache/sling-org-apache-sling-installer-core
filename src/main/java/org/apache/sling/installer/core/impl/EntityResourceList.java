@@ -489,4 +489,12 @@ public class EntityResourceList implements Serializable, TaskResourceGroup {
             return startNewCycle;
         }
     }
+
+    public void update(final String newAlias, final String newResourceId) {
+        this.alias = newAlias;
+        this.resourceId = newResourceId;
+        for(final RegisteredResourceImpl rsrc : this.getResources()) {
+            rsrc.updateEntityId(newResourceId);
+        }
+    }
 }

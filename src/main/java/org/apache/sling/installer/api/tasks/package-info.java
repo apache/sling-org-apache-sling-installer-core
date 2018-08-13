@@ -17,5 +17,5 @@
  * under the License.
  */
 
-@org.osgi.annotation.versioning.Version("1.4.1")
+@org.osgi.annotation.versioning.Version("1.5.0")
 package org.apache.sling.installer.api.tasks;

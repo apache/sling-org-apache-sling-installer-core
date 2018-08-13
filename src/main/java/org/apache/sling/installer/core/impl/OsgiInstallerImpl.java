@@ -39,8 +39,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.jetbrains.annotations.Nullable;
-
 import org.apache.sling.commons.osgi.PropertiesUtil;
 import org.apache.sling.installer.api.InstallableResource;
 import org.apache.sling.installer.api.OsgiInstaller;
@@ -58,11 +56,14 @@ import org.apache.sling.installer.api.tasks.InstallationContext;
 import org.apache.sling.installer.api.tasks.RegisteredResource;
 import org.apache.sling.installer.api.tasks.ResourceState;
 import org.apache.sling.installer.api.tasks.ResourceTransformer;
+import org.apache.sling.installer.api.tasks.ResourceUpdater;
 import org.apache.sling.installer.api.tasks.RetryHandler;
 import org.apache.sling.installer.api.tasks.TaskResource;
 import org.apache.sling.installer.api.tasks.TaskResourceGroup;
 import org.apache.sling.installer.api.tasks.TransformationResult;
+import org.apache.sling.installer.api.tasks.UpdatableResourceGroup;
 import org.apache.sling.installer.core.impl.tasks.BundleUpdateTask;
+import org.jetbrains.annotations.Nullable;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -139,6 +140,9 @@ implements OsgiInstaller, ResourceChangeListener, RetryHandler, InfoProvider, Ru
     /** A tracker for update handlers. */
     private SortingServiceTracker<UpdateHandler> updateHandlerTracker;
 
+    /** A tracker for the factories. */
+    private SortingServiceTracker<ResourceUpdater> updaterTracker;
+
     /** New resources lock. */
     private final Object resourcesLock = new Object();
 
@@ -183,6 +187,9 @@ implements OsgiInstaller, ResourceChangeListener, RetryHandler, InfoProvider, Ru
         }
         if ( this.updateHandlerTracker != null ) {
             this.updateHandlerTracker.close();
+        }
+        if ( this.updaterTracker != null ) {
+            this.updaterTracker.close();
         }
 
         this.listener.dispose();
@@ -230,9 +237,11 @@ implements OsgiInstaller, ResourceChangeListener, RetryHandler, InfoProvider, Ru
         this.factoryTracker = new SortingServiceTracker<>(ctx, InstallTaskFactory.class.getName(), this);
         this.transformerTracker = new SortingServiceTracker<>(ctx, ResourceTransformer.class.getName(), this);
         this.updateHandlerTracker = new SortingServiceTracker<>(ctx, UpdateHandler.class.getName(), null);
+        this.updaterTracker = new SortingServiceTracker<>(ctx, ResourceUpdater.class.getName(), this);
         this.factoryTracker.open();
         this.transformerTracker.open();
         this.updateHandlerTracker.open();
+        this.updaterTracker.open();
 
         this.logger.info("Apache Sling OSGi Installer Service started.");
         this.checkSatisfied();
@@ -260,7 +269,9 @@ implements OsgiInstaller, ResourceChangeListener, RetryHandler, InfoProvider, Ru
             while (this.active) {
                 this.listener.start();
 
-                processUpdateInfos();
+                this.handleResourceUpdaters();
+
+                this.processUpdateInfos();
 
                 // merge potential new resources
                 this.mergeNewlyRegisteredResources();
@@ -1563,4 +1574,70 @@ implements OsgiInstaller, ResourceChangeListener, RetryHandler, InfoProvider, Ru
         }
 
     };
+
+    /**
+     * Handle resource updates
+     */
+    private void handleResourceUpdaters() {
+        final List<ResourceUpdater> updaters = this.updaterTracker.getSortedServices();
+        for(final ResourceUpdater up : updaters) {
+            this.logger.info("Invoking installer resource updater {}", up.getClass().getName());
+            final List<UpdatableResourceGroup> groups = new ArrayList<>();
+            for(final String groupId : this.persistentList.getEntityIds()) {
+                final EntityResourceList list = this.persistentList.getEntityResourceList(groupId);
+                final String resourceType = list.getFirstResource().getType();
+                final String rsrcId = groupId.substring(resourceType.length() + 1);
+
+                final UpdatableResourceGroup grp = new UpdatableResourceGroup() {
+
+                    private String id = rsrcId;
+
+                    private String alias = list.getAlias();
+
+                    @Override
+                    public void setId(final String id) {
+                        if ( id == null ) {
+                            throw new IllegalArgumentException();
+                        }
+                        this.id = id;
+                    }
+
+                    @Override
+                    public void setAlias(final String value) {
+                        this.alias = value;
+                    }
+
+                    @Override
+                    public String getResourceType() {
+                        return resourceType;
+                    }
+
+                    @Override
+                    public String getId() {
+                        return id;
+                    }
+
+                    @Override
+                    public String getAlias() {
+                        return alias;
+                    }
+
+                    @Override
+                    public void update() {
+                        if ( !rsrcId.equals(id) ||
+                                (list.getAlias() == null && alias != null) ||
+                                (list.getAlias() != null && !list.getAlias().equals(alias)) ) {
+                           final String newGroupId = resourceType + ':' + id;
+                           auditLogger.info("Updating resource group from {} to {}", groupId, newGroupId);
+                           persistentList.update(groupId, alias, newGroupId);
+                           // persist list
+                           persistentList.save();
+                       }
+                    }
+                };
+                groups.add(grp);
+            }
+            up.update(groups);
+        }
+    }
 }
