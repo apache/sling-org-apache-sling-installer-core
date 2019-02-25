@@ -418,7 +418,7 @@ implements OsgiInstaller, ResourceChangeListener, RetryHandler, InfoProvider, Ru
     @Override
     public void updateResources(final String scheme,
             final InstallableResource[] resources,
-            final String[] ids) {
+            final String[] idsToRemove) {
         this.listener.start();
         try {
             final List<InternalResource> updatedResources = createResources(scheme, resources);
@@ -439,9 +439,9 @@ implements OsgiInstaller, ResourceChangeListener, RetryHandler, InfoProvider, Ru
                         }
                     }
                 }
-                if ( ids != null && ids.length > 0 ) {
+                if ( idsToRemove != null && idsToRemove.length > 0 ) {
                     final Set<String> removedUrls = new HashSet<>();
-                    for(final String id : ids) {
+                    for(final String id : idsToRemove) {
                         final String url = scheme + ':' + id;
                         // Will mark all resources which have r's URL as uninstallable
                         this.urlsToRemove.add(url);

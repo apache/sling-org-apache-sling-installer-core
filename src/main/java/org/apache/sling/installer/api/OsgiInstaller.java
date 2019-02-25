@@ -81,8 +81,8 @@ public interface OsgiInstaller {
 	 * Invalid resources are ignored.
      * @param urlScheme identifies the client.
      * @param resources An array of updated/new resources - might be null
-     * @param ids An array of identifiers for removed resources - might be null
+     * @param idsToRemove An array of identifiers for removed resources - might be null
 	 */
 	void updateResources(String urlScheme, InstallableResource[] resources,
-	        String[] ids);
+	        String[] idsToRemove);
 }
