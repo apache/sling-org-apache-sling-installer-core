@@ -57,7 +57,7 @@ public class ChangeStateTask extends InstallTask {
     public ChangeStateTask(final TaskResourceGroup r,
                            final ResourceState s,
                            final String error) {
-        this(r, s, null, null, null);
+        this(r, s, null, null, error);
     }
 
     /**
