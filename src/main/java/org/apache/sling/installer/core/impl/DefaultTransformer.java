@@ -85,6 +85,10 @@ public class DefaultTransformer
      * @return
      */
     private TransformationResult[] checkBundle(final RegisteredResource resource) {
+        if (!resource.getURL().endsWith(".jar")) {
+            logger.debug("Skip transforming non jar resource {}", resource.getURL());
+            return null;
+        }
         logger.debug("Checking headers for {}", resource);
         final Util.BundleHeaders headers = Util.readBundleHeaders(resource, logger);
         logger.debug("Found headers for {} : {}", resource, headers);
