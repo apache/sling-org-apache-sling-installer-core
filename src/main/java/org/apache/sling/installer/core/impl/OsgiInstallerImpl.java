@@ -70,6 +70,7 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
 import org.osgi.service.startlevel.StartLevel;
+import org.osgi.service.url.URLStreamHandlerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,7 +139,7 @@ implements OsgiInstaller, ResourceChangeListener, RetryHandler, InfoProvider, Ru
     private SortingServiceTracker<ResourceTransformer> transformerTracker;
 
     /** A tracker for update handlers. */
-    private SortingServiceTracker<UpdateHandler> updateHandlerTracker;
+    private UpdateHandlerTracker updateHandlerTracker;
 
     /** A tracker for the factories. */
     private SortingServiceTracker<ResourceUpdater> updaterTracker;
@@ -236,7 +237,7 @@ implements OsgiInstaller, ResourceChangeListener, RetryHandler, InfoProvider, Ru
         // start service trackers
         this.factoryTracker = new SortingServiceTracker<>(ctx, InstallTaskFactory.class.getName(), this);
         this.transformerTracker = new SortingServiceTracker<>(ctx, ResourceTransformer.class.getName(), this);
-        this.updateHandlerTracker = new SortingServiceTracker<>(ctx, UpdateHandler.class.getName(), null);
+        this.updateHandlerTracker = new UpdateHandlerTracker(ctx, this);
         this.updaterTracker = new SortingServiceTracker<>(ctx, ResourceUpdater.class.getName(), this);
         this.factoryTracker.open();
         this.transformerTracker.open();

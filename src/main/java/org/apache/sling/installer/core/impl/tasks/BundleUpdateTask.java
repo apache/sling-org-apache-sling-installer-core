@@ -102,6 +102,7 @@ public class BundleUpdateTask extends AbstractBundleTask {
             b.update(getResource().getInputStream());
             ctx.log("Updated bundle {} from resource {}", b, getResource());
 
+            setBundleLocation(getResource(), b.getLocation());
             // start level handling - after update to avoid starting the bundle
             // just before the update
             final BundleStartLevel startLevelService = b.adapt(BundleStartLevel.class);
