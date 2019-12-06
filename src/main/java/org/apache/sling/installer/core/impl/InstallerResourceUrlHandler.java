@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.ProtectionDomain;
 
 import org.apache.sling.installer.api.info.InfoProvider;
 import org.apache.sling.installer.api.info.ResourceGroup;
@@ -31,7 +32,10 @@ import org.osgi.service.url.AbstractURLStreamHandlerService;
 import org.osgi.service.url.URLStreamHandlerService;
 
 /**
- * URL Handler for schemes used by the UpdateHandlers
+ * URL Handler for schemes used by the UpdateHandlers<br/>
+ * 
+ * This is for example used by Apache Felix in the context of populating the {@link ProtectionDomain} of a bundle's class
+ * by evaluating the bundle location.
  * 
  * @see <a href="https://osgi.org/specification/osgi.core/7.0.0/service.url.html#d0e42987">OSGi URL Handlers</a>
  */
