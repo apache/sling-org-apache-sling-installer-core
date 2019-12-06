@@ -84,7 +84,7 @@ public class UpdateHandlerTracker extends SortingServiceTracker<UpdateHandler> {
         }
     }
 
-    private void updateUrlStreamHandler() {
+    private synchronized void updateUrlStreamHandler() {
         if (schemeUseCount.isEmpty()) {
             if (urlHandler != null) {
                 urlHandler.unregister();
