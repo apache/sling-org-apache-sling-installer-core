@@ -19,6 +19,8 @@
 package org.apache.sling.installer.core.impl.tasks;
 
 import org.apache.sling.installer.api.InstallableResource;
+import org.apache.sling.installer.api.info.Resource;
+import org.apache.sling.installer.api.tasks.TaskResource;
 import org.apache.sling.installer.api.tasks.TaskResourceGroup;
 import org.apache.sling.installer.core.impl.AbstractInstallTask;
 
@@ -27,8 +29,18 @@ import org.apache.sling.installer.core.impl.AbstractInstallTask;
  */
 public abstract class AbstractBundleTask extends AbstractInstallTask {
 
+    public final static String ATTRIBUTE_BUNDLE_LOCATION = "Bundle-Location";
+    
     public AbstractBundleTask(final TaskResourceGroup erl, final TaskSupport support) {
         super(erl, support);
+    }
+
+    public static void setBundleLocation(TaskResource resource, String location) {
+        resource.setAttribute(ATTRIBUTE_BUNDLE_LOCATION, location);
+    }
+
+    public static String getBundleLocation(Resource resource) {
+        return (String) resource.getAttribute(ATTRIBUTE_BUNDLE_LOCATION);
     }
 
     /**

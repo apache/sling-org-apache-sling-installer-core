@@ -46,6 +46,7 @@ public class BundleInstallTask extends AbstractBundleTask {
         try {
             final Bundle b = this.getBundleContext().installBundle(getResource().getURL(), getResource().getInputStream());
             ctx.log("Installed bundle {} from resource {}", b, getResource());
+            setBundleLocation(getResource(), getResource().getURL());
             // optionally set the start level
             if ( startLevel > 0 ) {
                 final BundleStartLevel startLevelService = b.adapt(BundleStartLevel.class);
