@@ -25,7 +25,7 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.Dictionary;
 
-import org.apache.sling.feature.io.json.ConfigurationJSONWriter;
+import org.apache.sling.feature.io.ConfiguratorUtil;
 import org.apache.sling.installer.api.serializer.ConfigurationSerializer;
 
 /** Serializes dictionary configuration objects (as specified in the configuration admin) into JSON format.
@@ -38,7 +38,7 @@ public class JsonConfigurationSerializer implements ConfigurationSerializer {
     @Override
     public void serialize(Dictionary<String, Object> dictionary, OutputStream outputStream) throws IOException {
         Writer writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
-        ConfigurationJSONWriter.writeConfiguration(writer, dictionary);
+        ConfiguratorUtil.writeConfiguration(writer, dictionary);
         writer.flush();
         // do not close the writer to prevent closing the underlying outputstream
     }

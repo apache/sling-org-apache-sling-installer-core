@@ -29,7 +29,7 @@ public class ConfigurationSerializerFactory {
         CONFIG,
         PROPERTIES,
         PROPERTIES_XML
-    };
+    }
     
     private ConfigurationSerializerFactory() {
     }
