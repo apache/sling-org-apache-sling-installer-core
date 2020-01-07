@@ -23,14 +23,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache.sling</groupId>
-        <artifactId>sling</artifactId>
-        <version>30</version>
+        <artifactId>sling-bundle-parent</artifactId>
+        <version>35</version>
         <relativePath/>
     </parent>
 
     <artifactId>org.apache.sling.installer.core</artifactId>
     <version>3.9.1-SNAPSHOT</version>
-    <packaging>bundle</packaging>
 
     <name>Apache Sling Installer</name>
     <description> 
@@ -40,6 +39,7 @@
 
     <properties>
         <sling.java.version>8</sling.java.version>
+        <bnd.version>4.3.1</bnd.version>
     </properties>
     <scm>
         <connection>scm:git:https://gitbox.apache.org/repos/asf/sling-org-apache-sling-installer-core.git</connection>
@@ -48,33 +48,13 @@
         <tag>HEAD</tag>
     </scm>
 
-    <build>
+<build>
         <plugins>
             <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
+                <groupId>biz.aQute.bnd</groupId>
+                <artifactId>bnd-baseline-maven-plugin</artifactId>
                 <configuration>
-                    <instructions>
-                        <Bundle-Activator>
-                            org.apache.sling.installer.core.impl.Activator
-                        </Bundle-Activator>
-                        <Conditional-Package>
-                            org.apache.felix.configurator.impl.json,
-                            org.apache.felix.configurator.impl.model,
-                            org.apache.sling.feature.io,
-                        </Conditional-Package>
-                        <Embed-Dependency>
-                            org.apache.sling.commons.johnzon,
-                            org.apache.felix.converter,
-                            org.apache.felix.configadmin;inline="org/apache/felix/cm/file/ConfigurationHandler.*",
-                            org.apache.sling.commons.osgi;inline="org/apache/sling/commons/osgi/ManifestHeader*.*|org/apache/sling/commons/osgi/PropertiesUtil.*|org/apache/sling/commons/osgi/SortingServiceTracker.*"
-                        </Embed-Dependency>
-                        <Provide-Capability><![CDATA[
-                            osgi.service;objectClass:List<String>="org.apache.sling.installer.api.OsgiInstaller,org.apache.sling.installer.api.ResourceChangeListener,org.apache.sling.installer.api.info.InfoProvider,org.apache.sling.installer.api.tasks.RetryHandler",
-                            osgi.service;objectClass:List<String>="org.apache.sling.installer.api.event.InstallationListener,org.apache.sling.installer.api.jmx.InstallerMBean"
-                        ]]></Provide-Capability>
-                    </instructions>
+                    <fullReport>true</fullReport>
                 </configuration>
             </plugin>
             <plugin>
@@ -143,9 +123,42 @@
     </build>
 
     <dependencies>
+        <!-- OSGi annotations (OSGi R7) -->
+        <!-- https://osgi.org/javadoc/osgi.annotation/7.0.0/org/osgi/annotation/versioning/package-frame.html -->
         <dependency>
             <groupId>org.osgi</groupId>
-            <artifactId>osgi.core</artifactId>
+            <artifactId>org.osgi.annotation.versioning</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- https://osgi.org/javadoc/osgi.annotation/7.0.0/org/osgi/annotation/bundle/package-frame.html -->
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.annotation.bundle</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- OSGi framework 1.8, Core R6 (https://osgi.org/javadoc/r6/core/org/osgi/framework/package-summary.html) -->
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.framework</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.service.startlevel</artifactId>
+            <version>1.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.service.url</artifactId>
+            <version>1.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.service.packageadmin</artifactId>
+            <version>1.2.0</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -154,34 +167,34 @@
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>16.0.2</version>
             <scope>provided</scope>
         </dependency>
+        <!-- all compile scope dependencies are embedded -->
         <dependency>
             <groupId>org.apache.sling</groupId>
             <artifactId>org.apache.sling.commons.osgi</artifactId>
             <version>2.2.0</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
         <!-- We use a class from the config admin implementation to read config files -->
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.configadmin</artifactId>
             <version>1.8.12</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
         <!-- We use classes from the configurator, json api, converter and feature.io to read/write JSON config files -->
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.configurator</artifactId>
             <version>1.0.10</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.converter</artifactId>
             <version>1.0.8</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.sling</groupId>
