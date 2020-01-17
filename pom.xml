@@ -186,7 +186,8 @@
         <dependency>
             <groupId>org.apache.sling</groupId>
             <artifactId>org.apache.sling.feature.io</artifactId>
-            <version>1.2.02.0           <scope>compile</scope>
+            <version>1.2.0</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
