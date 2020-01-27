@@ -24,7 +24,7 @@
     <parent>
         <groupId>org.apache.sling</groupId>
         <artifactId>sling-bundle-parent</artifactId>
-        <version>35</version>
+        <version>36</version>
         <relativePath/>
     </parent>
 
@@ -39,8 +39,9 @@
 
     <properties>
         <sling.java.version>8</sling.java.version>
-        <bnd.version>4.3.1</bnd.version>
+        <project.build.outputTimestamp>2020-01-14T08:04:00Z</project.build.outputTimestamp>
     </properties>
+
     <scm>
         <connection>scm:git:https://gitbox.apache.org/repos/asf/sling-org-apache-sling-installer-core.git</connection>
         <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/sling-org-apache-sling-installer-core.git</developerConnection>
@@ -54,7 +55,8 @@
                 <groupId>biz.aQute.bnd</groupId>
                 <artifactId>bnd-baseline-maven-plugin</artifactId>
                 <configuration>
-                    <fullReport>true</fullReport>
+                    <!-- temporarily continue on error due to https://github.com/bndtools/bnd/issues/3705, caused by switch from Java 7 -> Java 8 -->
+                    <continueOnError>true</continueOnError>
                 </configuration>
             </plugin>
             <plugin>
@@ -199,7 +201,7 @@
         <dependency>
             <groupId>org.apache.sling</groupId>
             <artifactId>org.apache.sling.feature.io</artifactId>
-            <version>1.1.1-SNAPSHOT</version>
+            <version>1.2.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
