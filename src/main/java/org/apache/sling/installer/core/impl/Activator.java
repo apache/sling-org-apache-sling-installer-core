@@ -35,6 +35,7 @@ import org.apache.sling.installer.api.tasks.InstallTaskFactory;
 import org.apache.sling.installer.api.tasks.ResourceTransformer;
 import org.apache.sling.installer.api.tasks.RetryHandler;
 import org.apache.sling.installer.core.impl.tasks.BundleTaskCreator;
+import org.osgi.annotation.bundle.Header;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -44,6 +45,7 @@ import org.osgi.framework.ServiceRegistration;
  * The activator sets up the logging and registers the
  * OSGi installer service.
  */
+@Header(name = Constants.BUNDLE_ACTIVATOR, value = "${@class}")
 public class Activator implements BundleActivator {
 
     /** Vendor of all registered services. */
