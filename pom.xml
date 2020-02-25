@@ -17,19 +17,18 @@
     specific language governing permissions and limitations
     under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache.sling</groupId>
         <artifactId>sling-bundle-parent</artifactId>
         <version>38</version>
-        <relativePath/>
+        <relativePath />
     </parent>
 
     <artifactId>org.apache.sling.installer.core</artifactId>
-    <version>3.10.1-SNAPSHOT</version>
+    <version>3.10.2</version>
 
     <name>Apache Sling Installer</name>
     <description> 
@@ -39,14 +38,14 @@
 
     <properties>
         <sling.java.version>8</sling.java.version>
-        <project.build.outputTimestamp>2020-02-21T08:26:57Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2020-02-25T13:37:21Z</project.build.outputTimestamp>
     </properties>
 
     <scm>
         <connection>scm:git:https://gitbox.apache.org/repos/asf/sling-org-apache-sling-installer-core.git</connection>
         <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/sling-org-apache-sling-installer-core.git</developerConnection>
         <url>https://gitbox.apache.org/repos/asf?p=sling-org-apache-sling-installer-core.git</url>
-        <tag>HEAD</tag>
+        <tag>org.apache.sling.installer.core-3.10.2</tag>
     </scm>
 
     <build>
@@ -90,13 +89,13 @@
                             <tasks name="Create a test bundle">
                                 <jar destfile="${project.build.directory}/${project.artifactId}-${project.version}-testbundle-1.0.jar">
                                     <fileset dir="${project.build.directory}/classes">
-                                        <include name="META-INF/**"/>
+                                        <include name="META-INF/**" />
                                     </fileset>
                                     <manifest>
-                                        <attribute name="Manifest-Version" value="2"/>
-                                        <attribute name="Bundle-Name" value="OSGi installer test bundle"/>
-                                        <attribute name="Bundle-SymbolicName" value="osgi-installer-testbundle"/>
-                                        <attribute name="Bundle-Version" value="1.0.4"/>
+                                        <attribute name="Manifest-Version" value="2" />
+                                        <attribute name="Bundle-Name" value="OSGi installer test bundle" />
+                                        <attribute name="Bundle-SymbolicName" value="osgi-installer-testbundle" />
+                                        <attribute name="Bundle-Version" value="1.0.4" />
                                     </manifest>
                                 </jar>
                             </tasks>
