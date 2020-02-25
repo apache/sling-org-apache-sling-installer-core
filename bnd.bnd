@@ -1,8 +1,9 @@
--conditionalpackage: org.apache.felix.configurator.impl.*,\
+-conditionalpackage: org.apache.sling.commons.osgi.*,\
+                     org.apache.felix.cm.*,\
+                     org.apache.felix.configurator.impl.*,\
+                     org.osgi.util.*,\
                      org.apache.sling.feature.io.*,\
                      javax.json.*,\
-                     org.apache.johnzon.core.*,\
-                     org.apache.felix.converter.*,\
-                     org.apache.felix.cm.*
+                     org.apache.johnzon.core.*
 Provide-Capability:  osgi.service;objectClass:List<String>="org.apache.sling.installer.api.OsgiInstaller,org.apache.sling.installer.api.ResourceChangeListener,org.apache.sling.installer.api.info.InfoProvider,org.apache.sling.installer.api.tasks.RetryHandler",\
                      osgi.service;objectClass:List<String>="org.apache.sling.installer.api.event.InstallationListener,org.apache.sling.installer.api.jmx.InstallerMBean"

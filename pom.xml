@@ -204,12 +204,6 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.utils</artifactId>
-            <version>1.11.2</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>org.apache.sling</groupId>
             <artifactId>org.apache.sling.commons.johnzon</artifactId>
             <version>1.0.0</version>
