@@ -17,14 +17,15 @@
     specific language governing permissions and limitations
     under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache.sling</groupId>
         <artifactId>sling-bundle-parent</artifactId>
         <version>38</version>
-        <relativePath />
+        <relativePath/>
     </parent>
 
     <artifactId>org.apache.sling.installer.core</artifactId>
@@ -48,13 +49,14 @@
         <tag>HEAD</tag>
     </scm>
 
-<build>
+    <build>
         <plugins>
             <plugin>
                 <groupId>biz.aQute.bnd</groupId>
                 <artifactId>bnd-baseline-maven-plugin</artifactId>
                 <configuration>
-                    <!-- temporarily continue on error due to https://github.com/bndtools/bnd/issues/3705, caused by switch from Java 7 -> Java 8 -->
+                    <!-- temporarily continue on error due to https://github.com/bndtools/bnd/issues/3705, caused by switch from Java 7 -> Java 
+                        8 -->
                     <continueOnError>true</continueOnError>
                 </configuration>
             </plugin>
@@ -88,13 +90,13 @@
                             <tasks name="Create a test bundle">
                                 <jar destfile="${project.build.directory}/${project.artifactId}-${project.version}-testbundle-1.0.jar">
                                     <fileset dir="${project.build.directory}/classes">
-                                        <include name="META-INF/**" />
+                                        <include name="META-INF/**"/>
                                     </fileset>
                                     <manifest>
-                                        <attribute name="Manifest-Version" value="2" />
-                                        <attribute name="Bundle-Name" value="OSGi installer test bundle" />
-                                        <attribute name="Bundle-SymbolicName" value="osgi-installer-testbundle" />
-                                        <attribute name="Bundle-Version" value="1.0.4" />
+                                        <attribute name="Manifest-Version" value="2"/>
+                                        <attribute name="Bundle-Name" value="OSGi installer test bundle"/>
+                                        <attribute name="Bundle-SymbolicName" value="osgi-installer-testbundle"/>
+                                        <attribute name="Bundle-Version" value="1.0.4"/>
                                     </manifest>
                                 </jar>
                             </tasks>
@@ -162,6 +164,18 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.util.function</artifactId>
+            <version>1.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.util.converter</artifactId>
+            <version>1.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
@@ -189,12 +203,6 @@
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.configurator</artifactId>
             <version>1.0.10</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.converter</artifactId>
-            <version>1.0.8</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

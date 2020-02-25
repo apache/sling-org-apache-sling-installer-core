@@ -1,7 +1,6 @@
 -conditionalpackage: org.apache.sling.commons.osgi.*,\
                      org.apache.felix.cm.*,\
                      org.apache.felix.configurator.impl.*,\
-                     org.osgi.util.*,\
                      org.apache.sling.feature.io.*,\
                      javax.json.*,\
                      org.apache.johnzon.core.*
