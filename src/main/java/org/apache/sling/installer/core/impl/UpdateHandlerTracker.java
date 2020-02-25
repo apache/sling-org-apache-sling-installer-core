@@ -18,7 +18,6 @@
  */
 package org.apache.sling.installer.core.impl;
 
-import java.security.ProtectionDomain;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -88,6 +87,7 @@ public class UpdateHandlerTracker extends SortingServiceTracker<UpdateHandler> {
         if (schemeUseCount.isEmpty()) {
             if (urlHandler != null) {
                 urlHandler.unregister();
+                urlHandler = null;
             }
         } else {
             if (urlHandler == null) {
