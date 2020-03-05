@@ -238,7 +238,7 @@ public class BundleTaskCreator
                     // if not isMultiVersion for install and update, we want the bundle with the
                     // highest version - otherwise only check for very same version (potential updates of snapshots)
                     String bundleVersion = null;
-                    if (this.isMultiVersion == true) {
+                    if (this.isMultiVersion) {
                         bundleVersion = newVersion.toString();
                     } 
 
