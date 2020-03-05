@@ -134,7 +134,7 @@ public class BundleTaskCreator
         return "Apache Sling Bundle Install Task Factory";
     }
 
-    /**
+	/**
      * Create a bundle task - install, update or remove
      *
      * @see org.apache.sling.installer.api.tasks.InstallTaskFactory#createTask(org.apache.sling.installer.api.tasks.TaskResourceGroup)
@@ -169,15 +169,15 @@ public class BundleTaskCreator
 
         // Uninstall
         final InstallTask result;
-        if (toActivate.getState() == ResourceState.UNINSTALL) {
+		if (toActivate.getState() == ResourceState.UNINSTALL) {
             // find the info with the exact version
             final BundleInfo info = this.getBundleInfo(
                     symbolicName,
                     (String)toActivate.getAttribute(Constants.BUNDLE_VERSION));
-            // Remove corresponding bundle if present and if we installed it
-            if ( info != null ) {
-                // if this is an uninstall, check if we have to install an older version
-                // in this case we should do an update instead of uninstall/install (!)
+		    // Remove corresponding bundle if present and if we installed it
+		    if ( info != null ) {
+	            // if this is an uninstall, check if we have to install an older version
+	            // in this case we should do an update instead of uninstall/install (!)
                 Iterator<TaskResource> candidatesIt = ((EntityResourceList)resourceList).getActiveResourceIterator();
                 TaskResource second = null;
                 while (candidatesIt != null && second == null && candidatesIt.hasNext()) {
@@ -194,8 +194,8 @@ public class BundleTaskCreator
                         }
                     }
                 }
-                if ( second != null &&
-                    ( second.getState() == ResourceState.IGNORED || second.getState() == ResourceState.INSTALLED || second.getState() == ResourceState.INSTALL ) ) {
+	            if ( second != null &&
+	                ( second.getState() == ResourceState.IGNORED || second.getState() == ResourceState.INSTALLED || second.getState() == ResourceState.INSTALL ) ) {
                     second.setAttribute(FORCE_INSTALL_VERSION, info.version.toString());
                     BundleUtil.clearBundleStart(second);
                     logger.debug("Detected downgrade of bundle {}", symbolicName);
@@ -215,11 +215,11 @@ public class BundleTaskCreator
                 result = new ChangeStateTask(resourceList, ResourceState.UNINSTALLED, null);
             }
 
-        // Install
-        } else {
-            // check for installer and system update
-            final Integer asyncTaskCounter = (Integer)toActivate.getAttribute(InstallTask.ASYNC_ATTR_NAME);
-            if ( asyncTaskCounter != null ) {
+		// Install
+		} else {
+		    // check for installer and system update
+		    final Integer asyncTaskCounter = (Integer)toActivate.getAttribute(InstallTask.ASYNC_ATTR_NAME);
+		    if ( asyncTaskCounter != null ) {
                 if ( isInstallerCoreBundle ) {
                     result = new InstallerBundleUpdateTask(resourceList, this.taskSupport);
                 } else {
@@ -244,14 +244,14 @@ public class BundleTaskCreator
 
                     final BundleInfo info = this.getBundleInfo(symbolicName, bundleVersion);
 
-                // check if we should start the bundle as we installed it in the previous run
-                if (info == null) {
-                    // bundle is not installed yet: install
-                    result = new BundleInstallTask(resourceList, this.taskSupport);
-                } else if ( BundleUtil.isBundleStart(toActivate) ) {
-                    result = new BundleStartTask(resourceList, info.id, this.taskSupport);
-                } else {
-                    boolean doUpdate = false;
+    		    // check if we should start the bundle as we installed it in the previous run
+    		    if (info == null) {
+    			    // bundle is not installed yet: install
+    			    result = new BundleInstallTask(resourceList, this.taskSupport);
+    		    } else if ( BundleUtil.isBundleStart(toActivate) ) {
+    	            result = new BundleStartTask(resourceList, info.id, this.taskSupport);
+    			} else {
+    	            boolean doUpdate = false;
 
                     final int compare = info.version.compareTo(newVersion);
                     if (compare < 0) {
@@ -265,11 +265,11 @@ public class BundleTaskCreator
                             logger.debug("Bundle " + info.symbolicName + " " + newVersion
                                         + " is not installed, bundle with higher version is already installed.");
                         }
-                    } else if (compare == 0 && BundleInfo.isSnapshot(newVersion)) {
+    			    } else if (compare == 0 && BundleInfo.isSnapshot(newVersion)) {
 
                         // installed, same version but SNAPSHOT
-                        doUpdate = true;
-                    }
+    			        doUpdate = true;
+    			    }
                     if (doUpdate) {
 
                         logger.debug("Scheduling update of {}", toActivate);
@@ -291,12 +291,12 @@ public class BundleTaskCreator
                         result = new ChangeStateTask(resourceList, ResourceState.IGNORED, message);
                         }
                     }
-                }
-            }
+    			}
+		    }
             toActivate.setAttribute(FORCE_INSTALL_VERSION, null);
-        }
-        return result;
-    }
+		}
+		return result;
+	}
 
     protected BundleInfo getBundleInfo(final String symbolicName, final String version) {
         return BundleInfo.getBundleInfo(this.bundleContext, symbolicName, version);
