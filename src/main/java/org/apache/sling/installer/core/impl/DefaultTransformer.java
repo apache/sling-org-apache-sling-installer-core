@@ -50,7 +50,7 @@ public class DefaultTransformer
      */
     @Override
     public void init(final BundleContext bctx, final ResourceChangeListener rcl, RetryHandler retryHandler) {
-        this.isMultiVersion = Boolean.valueOf(bctx.getProperty("sling.installer.multiversion")) ? true : false;
+        this.isMultiVersion = Boolean.TRUE.equals(Boolean.valueOf(bctx.getProperty("sling.installer.multiversion")));
     }
 
     /**

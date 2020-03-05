@@ -81,7 +81,7 @@ public class BundleTaskCreator
         this.bundleContext = bc;
         this.retryHandler = retryHandler;
         
-        this.isMultiVersion = Boolean.valueOf(bc.getProperty("sling.installer.multiversion")) ? true : false;
+        this.isMultiVersion = Boolean.TRUE.equals(Boolean.valueOf(bc.getProperty("sling.installer.multiversion")));
         this.bundleContext.addBundleListener(this);
         this.bundleContext.addFrameworkListener(this);
 
