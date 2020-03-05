@@ -137,20 +137,20 @@ public class BundleTaskCreator
 	/**
      * Create a bundle task - install, update or remove
      *
-     * @see org.apache.sling.installer.api.tasks.InstallTaskFactory#createTask(org.apache.sling.installer.api.tasks.TaskResourceGroup)
-     */
-    @Override
+	 * @see org.apache.sling.installer.api.tasks.InstallTaskFactory#createTask(org.apache.sling.installer.api.tasks.TaskResourceGroup)
+	 */
+	@Override
     public InstallTask createTask(final TaskResourceGroup resourceList) {
-        // quick check of the resource type.
-        final TaskResource toActivate = resourceList.getActiveResource();
-        if ( toActivate.getType().equals(PersistentResourceList.RESTART_ACTIVE_BUNDLES_TYPE) ) {
-            return new RestartActiveBundlesTask(resourceList, this.taskSupport);
-        }
-        if ( !toActivate.getType().equals(InstallableResource.TYPE_BUNDLE) ) {
-            return null;
-        }
+	    // quick check of the resource type.
+	    final TaskResource toActivate = resourceList.getActiveResource();
+	    if ( toActivate.getType().equals(PersistentResourceList.RESTART_ACTIVE_BUNDLES_TYPE) ) {
+	        return new RestartActiveBundlesTask(resourceList, this.taskSupport);
+	    }
+	    if ( !toActivate.getType().equals(InstallableResource.TYPE_BUNDLE) ) {
+	        return null;
+	    }
 
-        // check if symbolic name and version is provided in the attributes
+	    // check if symbolic name and version is provided in the attributes
         if ( toActivate.getAttribute(Constants.BUNDLE_SYMBOLICNAME) == null ) {
             final Util.BundleHeaders headers = Util.readBundleHeaders(toActivate, logger);
             if ( headers == null ) {
@@ -200,20 +200,20 @@ public class BundleTaskCreator
                     BundleUtil.clearBundleStart(second);
                     logger.debug("Detected downgrade of bundle {}", symbolicName);
                     result = new ChangeStateTask(resourceList, ResourceState.UNINSTALLED, null);
-                } else {
-                    // prevent uninstalling the installer itself!
-                    if ( isInstallerCoreBundle ) {
-                        logger.debug("Prevent completely uninstalling installer bundle {}", symbolicName);
-                        result = new ChangeStateTask(resourceList, ResourceState.UNINSTALLED, null);
-                    } else {
-                        result = new BundleRemoveTask(resourceList, this.taskSupport);
-                    }
-                }
-            } else {
-                logger.debug("Bundle {}:{} is not installed anymore - nothing to remove.", symbolicName,
-                        toActivate.getAttribute(Constants.BUNDLE_VERSION));
-                result = new ChangeStateTask(resourceList, ResourceState.UNINSTALLED, null);
-            }
+	            } else {
+	                // prevent uninstalling the installer itself!
+	                if ( isInstallerCoreBundle ) {
+	                    logger.debug("Prevent completely uninstalling installer bundle {}", symbolicName);
+	                    result = new ChangeStateTask(resourceList, ResourceState.UNINSTALLED, null);
+	                } else {
+	                    result = new BundleRemoveTask(resourceList, this.taskSupport);
+	                }
+	            }
+		    } else {
+	            logger.debug("Bundle {}:{} is not installed anymore - nothing to remove.", symbolicName,
+	                    toActivate.getAttribute(Constants.BUNDLE_VERSION));
+	            result = new ChangeStateTask(resourceList, ResourceState.UNINSTALLED, null);
+	        }
 
 		// Install
 		} else {
@@ -227,7 +227,7 @@ public class BundleTaskCreator
                     result = new ChangeStateTask(resourceList, ResourceState.INSTALLED, null,
                                     new String[] {InstallTask.ASYNC_ATTR_NAME}, null);
                 }
-            } else {
+		    } else {
                 final Version newVersion = new Version((String) toActivate.getAttribute(Constants.BUNDLE_VERSION));
                 if (bundleBlacklist.isBlacklisted(symbolicName, newVersion)) {
                     String message = MessageFormat.format("Ignoring blacklisted bundle {0} found at {1}", symbolicName, toActivate.getURL());
