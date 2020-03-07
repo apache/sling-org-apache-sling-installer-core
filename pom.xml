@@ -51,13 +51,37 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>biz.aQute.bnd</groupId>
-                <artifactId>bnd-baseline-maven-plugin</artifactId>
-                <configuration>
-                    <!-- temporarily continue on error due to https://github.com/bndtools/bnd/issues/3705, caused by switch from Java 7 -> Java 
-                        8 -->
-                    <continueOnError>true</continueOnError>
-                </configuration>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.2</version>
+                <executions>
+                    <execution>
+                        <id>shade-embedded</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <createSourcesJar>true</createSourcesJar>
+                            <shadeSourcesContent>true</shadeSourcesContent>
+                            <relocations>
+                                <relocation>
+                                    <pattern>org.apache.felix.cm.file</pattern>
+                                    <shadedPattern>org.apache.sling.installer.core.impl.felix.cm</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.apache.sling.feature.io</pattern>
+                                    <shadedPattern>org.apache.sling.installer.core.impl.feature</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.apache.felix.configurator.impl</pattern>
+                                    <shadedPattern>org.apache.sling.installer.core.impl.configurator</shadedPattern>
+                                </relocation>
+                            </relocations>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -175,6 +199,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.apache.sling</groupId>
+            <artifactId>org.apache.sling.commons.johnzon</artifactId>
+            <version>1.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
@@ -188,26 +218,20 @@
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.configadmin</artifactId>
             <version>1.8.12</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <!-- We use classes from the configurator, json api, converter and feature.io to read/write JSON config files -->
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.configurator</artifactId>
             <version>1.0.10</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.sling</groupId>
             <artifactId>org.apache.sling.feature.io</artifactId>
             <version>1.2.0</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.sling</groupId>
-            <artifactId>org.apache.sling.commons.johnzon</artifactId>
-            <version>1.0.0</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <!-- Basic dependencies for Unit Tests -->
         <dependency>
