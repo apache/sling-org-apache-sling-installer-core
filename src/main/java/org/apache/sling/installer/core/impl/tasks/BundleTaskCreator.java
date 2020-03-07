@@ -236,51 +236,55 @@ public class BundleTaskCreator
                     // highest version
                     final BundleInfo info = this.getBundleInfo(symbolicName, null);
 
-    		    // check if we should start the bundle as we installed it in the previous run
-    		    if (info == null) {
-    			    // bundle is not installed yet: install
-    			    result = new BundleInstallTask(resourceList, this.taskSupport);
-    		    } else if ( BundleUtil.isBundleStart(toActivate) ) {
-    	            result = new BundleStartTask(resourceList, info.id, this.taskSupport);
-    			} else {
-    	            boolean doUpdate = false;
-
-    			    final int compare = info.version.compareTo(newVersion);
-                    if (compare < 0) {
-                        // installed version is lower -> update
-                        doUpdate = true;
-                    } else if (compare > 0) {
-                        final String forceVersion = (String) toActivate.getAttribute(FORCE_INSTALL_VERSION);
-                        if ( forceVersion != null && info.version.compareTo(new Version(forceVersion)) == 0 ) {
-                            doUpdate = true;
-                        } else {
-                            logger.debug("Bundle " + info.symbolicName + " " + newVersion
-                                        + " is not installed, bundle with higher version is already installed.");
-                        }
-    			    } else if (compare == 0 && BundleInfo.isSnapshot(newVersion)) {
-
-                        // installed, same version but SNAPSHOT
-    			        doUpdate = true;
-    			    }
-                    if (doUpdate) {
-
-                        logger.debug("Scheduling update of {}", toActivate);
-                        // check if this is the system bundle
-                        if ( Constants.SYSTEM_BUNDLE_SYMBOLICNAME.equals(symbolicName) ) {
-                            result = new SystemBundleUpdateTask(resourceList, this.taskSupport);
-                            // check if this is a installer update
-                        } else if ( isInstallerCoreBundle ) {
-                            result = new InstallerBundleUpdateTask(resourceList, this.taskSupport);
-                        } else {
-                            result = new BundleUpdateTask(resourceList, this.taskSupport);
-                        }
-                    } else if ( compare == 0 && (isInstallerCoreBundle || Constants.SYSTEM_BUNDLE_SYMBOLICNAME.equals(symbolicName)) ) {
-                        // the installer core bundle / system bundle has been updated, just set state
-                        result = new ChangeStateTask(resourceList, ResourceState.INSTALLED, "This is the system bundle, therefore nothing was actually done!");
+                    // check if we should start the bundle as we installed it in the previous run
+                    if (info == null) {
+                        // bundle is not installed yet: install
+                        result = new BundleInstallTask(resourceList, this.taskSupport);
+                    } else if (BundleUtil.isBundleStart(toActivate)) {
+                        result = new BundleStartTask(resourceList, info.id, this.taskSupport);
                     } else {
-                        String message = MessageFormat.format("Nothing to install for {0}, same or newer version {1} already installed.", toActivate, newVersion);
-                        logger.debug(message);
-                        result = new ChangeStateTask(resourceList, ResourceState.IGNORED, message);
+                        boolean doUpdate = false;
+
+                        final int compare = info.version.compareTo(newVersion);
+                        if (compare < 0) {
+                            // installed version is lower -> update
+                            doUpdate = true;
+                        } else if (compare > 0) {
+                            final String forceVersion = (String) toActivate.getAttribute(FORCE_INSTALL_VERSION);
+                            if (forceVersion != null && info.version.compareTo(new Version(forceVersion)) == 0) {
+                                doUpdate = true;
+                            } else {
+                                logger.debug("Bundle " + info.symbolicName + " " + newVersion
+                                        + " is not installed, bundle with higher version is already installed.");
+                            }
+                        } else if (compare == 0 && BundleInfo.isSnapshot(newVersion)) {
+
+                            // installed, same version but SNAPSHOT
+                            doUpdate = true;
+                        }
+                        if (doUpdate) {
+
+                            logger.debug("Scheduling update of {}", toActivate);
+                            // check if this is the system bundle
+                            if (Constants.SYSTEM_BUNDLE_SYMBOLICNAME.equals(symbolicName)) {
+                                result = new SystemBundleUpdateTask(resourceList, this.taskSupport);
+                                // check if this is a installer update
+                            } else if (isInstallerCoreBundle) {
+                                result = new InstallerBundleUpdateTask(resourceList, this.taskSupport);
+                            } else {
+                                result = new BundleUpdateTask(resourceList, this.taskSupport);
+                            }
+                        } else if (compare == 0 && (isInstallerCoreBundle
+                                || Constants.SYSTEM_BUNDLE_SYMBOLICNAME.equals(symbolicName))) {
+                            // the installer core bundle / system bundle has been updated, just set state
+                            result = new ChangeStateTask(resourceList, ResourceState.INSTALLED,
+                                    "This is the system bundle, therefore nothing was actually done!");
+                        } else {
+                            String message = MessageFormat.format(
+                                    "Nothing to install for {0}, same or newer version {1} already installed.",
+                                    toActivate, newVersion);
+                            logger.debug(message);
+                            result = new ChangeStateTask(resourceList, ResourceState.IGNORED, message);
                         }
                     }
     			}

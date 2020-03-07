@@ -18,9 +18,9 @@
  */
 package org.apache.sling.installer.api.serializer;
 
-import org.apache.sling.installer.core.impl.ConfigConfigurationSerializer;
-import org.apache.sling.installer.core.impl.JsonConfigurationSerializer;
-import org.apache.sling.installer.core.impl.PropertiesConfigurationSerializer;
+import org.apache.sling.installer.core.impl.serializer.ConfigConfigurationSerializer;
+import org.apache.sling.installer.core.impl.serializer.JsonConfigurationSerializer;
+import org.apache.sling.installer.core.impl.serializer.PropertiesConfigurationSerializer;
 import org.jetbrains.annotations.NotNull;
 
 public class ConfigurationSerializerFactory {

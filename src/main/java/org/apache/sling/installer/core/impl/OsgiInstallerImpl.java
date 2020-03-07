@@ -1369,12 +1369,10 @@ implements OsgiInstaller, ResourceChangeListener, RetryHandler, InfoProvider, Ru
         final List<ServiceReference<UpdateHandler>> references = this.updateHandlerTracker.getSortedServiceReferences();
         for(final ServiceReference ref : references) {
             final String[] supportedSchemes = Converters.standardConverter()
-                    .convert(ref.getProperty(UpdateHandler.PROPERTY_SCHEMES)).defaultValue(null).to(String[].class);
-            if ( supportedSchemes != null ) {
-                for(final String support : supportedSchemes ) {
-                    if ( scheme.equals(support) ) {
-                        return this.updateHandlerTracker.getService(ref);
-                    }
+                    .convert(ref.getProperty(UpdateHandler.PROPERTY_SCHEMES)).to(String[].class);
+            for (final String support : supportedSchemes) {
+                if (scheme.equals(support)) {
+                    return this.updateHandlerTracker.getService(ref);
                 }
             }
         }

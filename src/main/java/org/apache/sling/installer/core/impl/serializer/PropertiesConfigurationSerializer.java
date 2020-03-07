@@ -16,20 +16,36 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.sling.installer.core.impl;
+package org.apache.sling.installer.core.impl.serializer;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Dictionary;
+import java.util.Properties;
 
-import org.apache.felix.cm.file.ConfigurationHandler;
 import org.apache.sling.installer.api.serializer.ConfigurationSerializer;
 import org.jetbrains.annotations.NotNull;
+import org.osgi.util.converter.Converter;
+import org.osgi.util.converter.Converters;
 
-public class ConfigConfigurationSerializer implements ConfigurationSerializer {
+public class PropertiesConfigurationSerializer implements ConfigurationSerializer {
+
+    private final boolean isXml;
+    
+    public PropertiesConfigurationSerializer(boolean isXml) {
+        this.isXml = isXml;
+    }
 
     @Override
     public void serialize(@NotNull Dictionary<String, Object> dictionary, @NotNull OutputStream outputStream) throws IOException {
-        ConfigurationHandler.write(outputStream, dictionary);
+        // convert to properties object
+        Converter converter = Converters.standardConverter();
+        Properties properties = converter.convert(dictionary).to(Properties.class);
+        if (!isXml) {
+            properties.store(outputStream, null);
+        } else {
+            properties.storeToXML(outputStream, null);
+        }
     }
+
 }

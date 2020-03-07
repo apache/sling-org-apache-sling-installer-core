@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.sling.installer.core.impl;
+package org.apache.sling.installer.core.impl.serializer;
 
 import java.io.IOException;
 import java.io.OutputStream;
