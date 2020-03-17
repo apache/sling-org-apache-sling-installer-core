@@ -39,7 +39,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.sling.commons.osgi.PropertiesUtil;
 import org.apache.sling.installer.api.InstallableResource;
 import org.apache.sling.installer.api.OsgiInstaller;
 import org.apache.sling.installer.api.ResourceChangeListener;
@@ -70,7 +69,7 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
 import org.osgi.service.startlevel.StartLevel;
-import org.osgi.service.url.URLStreamHandlerService;
+import org.osgi.util.converter.Converters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -165,7 +164,8 @@ implements OsgiInstaller, ResourceChangeListener, RetryHandler, InfoProvider, Ru
         final File f = FileDataStore.SHARED.getDataFile("RegisteredResourceList.ser");
         this.listener = new InstallListener(ctx, logger);
         this.persistentList = new PersistentResourceList(f, listener);
-        this.switchStartLevel = PropertiesUtil.toBoolean(ctx.getProperty(PROP_START_LEVEL_HANDLING), false);
+        this.switchStartLevel = Converters.standardConverter().convert(ctx.getProperty(PROP_START_LEVEL_HANDLING))
+                .defaultValue(Boolean.FALSE).to(Boolean.class);
     }
 
     /**
@@ -703,7 +703,7 @@ implements OsgiInstaller, ResourceChangeListener, RetryHandler, InfoProvider, Ru
         SLEEP,
         SHUTDOWN,
         CYCLE
-    };
+    }
 
     /**
      * Execute all tasks
@@ -806,7 +806,6 @@ implements OsgiInstaller, ResourceChangeListener, RetryHandler, InfoProvider, Ru
 
             final InstallationContext ctx = new InstallationContext() {
 
-                @SuppressWarnings("deprecation")
                 @Override
                 public void addTaskToNextCycle(final InstallTask t) {
                     logger.warn("Deprecated method addTaskToNextCycle was called. Task will be executed in this cycle instead: {}", t);
@@ -823,7 +822,6 @@ implements OsgiInstaller, ResourceChangeListener, RetryHandler, InfoProvider, Ru
                     }
                 }
 
-                @SuppressWarnings("deprecation")
                 @Override
                 public void addAsyncTask(final InstallTask t) {
                     if ( t.isAsynchronousTask() ) {
@@ -946,7 +944,8 @@ implements OsgiInstaller, ResourceChangeListener, RetryHandler, InfoProvider, Ru
      */
     private void transformResources() {
         boolean changed = false;
-        final List<ServiceReference> serviceRefs = this.transformerTracker.getSortedServiceReferences();
+        final List<ServiceReference<ResourceTransformer>> serviceRefs = this.transformerTracker
+                .getSortedServiceReferences();
 
         if ( serviceRefs.size() > 0 ) {
             synchronized ( this.resourcesLock ) {
@@ -956,7 +955,7 @@ implements OsgiInstaller, ResourceChangeListener, RetryHandler, InfoProvider, Ru
 
                 while ( index < unknownList.size() ) {
                     final RegisteredResource resource = unknownList.get(index);
-                    for(final ServiceReference reference : serviceRefs) {
+                    for (final ServiceReference<ResourceTransformer> reference : serviceRefs) {
                         final Long id = (Long)reference.getProperty(Constants.SERVICE_ID);
                         // check if this transformer has already been invoked for the resource
                         final String transformers = (String)((RegisteredResourceImpl)resource).getAttribute(ResourceTransformer.class.getName());
@@ -964,7 +963,7 @@ implements OsgiInstaller, ResourceChangeListener, RetryHandler, InfoProvider, Ru
                                 (transformers != null && transformers.contains(":" + id + ':'))) {
                             continue;
                         }
-                        final ResourceTransformer transformer = (ResourceTransformer) this.transformerTracker.getService(reference);
+                        final ResourceTransformer transformer = this.transformerTracker.getService(reference);
                         if ( transformer != null ) {
                             try {
                                 final TransformationResult[] result = transformer.transform(resource);
@@ -1143,7 +1142,10 @@ implements OsgiInstaller, ResourceChangeListener, RetryHandler, InfoProvider, Ru
             final Dictionary<String, Object> dict,
             final Map<String, Object> attributes) {
         final String key = resourceType + ':' + entityId;
-        final boolean persistChange = (attributes != null ? PropertiesUtil.toBoolean(attributes.get(ResourceChangeListener.RESOURCE_PERSIST), true) : true);
+        final boolean persistChange = attributes != null
+                ? Converters.standardConverter().convert(attributes.get(ResourceChangeListener.RESOURCE_PERSIST))
+                        .defaultValue(Boolean.TRUE).to(Boolean.class)
+                : true;
         try {
             boolean compactAndSave = false;
             boolean done = false;
@@ -1362,15 +1364,15 @@ implements OsgiInstaller, ResourceChangeListener, RetryHandler, InfoProvider, Ru
     /**
      * Search a handler for the scheme.
      */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     private UpdateHandler findHandler(final String scheme) {
-        final List<ServiceReference> references = this.updateHandlerTracker.getSortedServiceReferences();
+        final List<ServiceReference<UpdateHandler>> references = this.updateHandlerTracker.getSortedServiceReferences();
         for(final ServiceReference ref : references) {
-            final String[] supportedSchemes = PropertiesUtil.toStringArray(ref.getProperty(UpdateHandler.PROPERTY_SCHEMES));
-            if ( supportedSchemes != null ) {
-                for(final String support : supportedSchemes ) {
-                    if ( scheme.equals(support) ) {
-                        return (UpdateHandler) this.updateHandlerTracker.getService(ref);
-                    }
+            final String[] supportedSchemes = Converters.standardConverter()
+                    .convert(ref.getProperty(UpdateHandler.PROPERTY_SCHEMES)).to(String[].class);
+            for (final String support : supportedSchemes) {
+                if (scheme.equals(support)) {
+                    return this.updateHandlerTracker.getService(ref);
                 }
             }
         }

@@ -18,14 +18,12 @@
  */
 package org.apache.sling.installer.core.impl;
 
-import java.security.ProtectionDomain;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.sling.commons.osgi.PropertiesUtil;
 import org.apache.sling.installer.api.UpdateHandler;
 import org.apache.sling.installer.api.info.InfoProvider;
 import org.osgi.framework.BundleContext;
@@ -33,6 +31,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.url.URLConstants;
 import org.osgi.service.url.URLStreamHandlerService;
+import org.osgi.util.converter.Converters;
 
 /**
  * Registers one (singleton) url handler handling all registered schemes of UpdateHandler's.
@@ -52,35 +51,34 @@ public class UpdateHandlerTracker extends SortingServiceTracker<UpdateHandler> {
     }
 
     @Override
-    public Object addingService(ServiceReference reference) {
+    public UpdateHandler addingService(ServiceReference<UpdateHandler> reference) {
         addOrRemoveService(reference, true);
         return super.addingService(reference);
     }
 
     @Override
-    public void removedService(ServiceReference reference, Object service) {
+    public void removedService(ServiceReference<UpdateHandler> reference, UpdateHandler service) {
         addOrRemoveService(reference, false);
         super.removedService(reference, service);
     }
 
-    private void addOrRemoveService(ServiceReference reference, boolean isAdd) {
-        final String[] schemes = PropertiesUtil.toStringArray(reference.getProperty(UpdateHandler.PROPERTY_SCHEMES));
-        if (schemes != null && schemes.length > 0) {
-            boolean hasChanged = false;
-            for (String scheme : schemes) {
-                if (isAdd) {
-                    if (addScheme(scheme)) {
-                        hasChanged = true;
-                    }
-                } else {
-                    if (removeScheme(scheme)) {
-                        hasChanged = true;
-                    }
+    private void addOrRemoveService(ServiceReference<UpdateHandler> reference, boolean isAdd) {
+        final String[] schemes = Converters.standardConverter()
+                .convert(reference.getProperty(UpdateHandler.PROPERTY_SCHEMES)).to(String[].class);
+        boolean hasChanged = false;
+        for (String scheme : schemes) {
+            if (isAdd) {
+                if (addScheme(scheme)) {
+                    hasChanged = true;
+                }
+            } else {
+                if (removeScheme(scheme)) {
+                    hasChanged = true;
                 }
             }
-            if (hasChanged) {
-                updateUrlStreamHandler();
-            }
+        }
+        if (hasChanged) {
+            updateUrlStreamHandler();
         }
     }
 
@@ -88,6 +86,7 @@ public class UpdateHandlerTracker extends SortingServiceTracker<UpdateHandler> {
         if (schemeUseCount.isEmpty()) {
             if (urlHandler != null) {
                 urlHandler.unregister();
+                urlHandler = null;
             }
         } else {
             if (urlHandler == null) {
