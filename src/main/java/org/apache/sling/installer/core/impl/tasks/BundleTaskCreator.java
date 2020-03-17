@@ -71,6 +71,8 @@ public class BundleTaskCreator
 
     private BundleBlackList bundleBlacklist;
 
+    private boolean isMultiVersion;
+
     /**
      * @see org.apache.sling.installer.core.impl.InternalService#init(org.osgi.framework.BundleContext, org.apache.sling.installer.api.ResourceChangeListener, RetryHandler)
      */
@@ -78,7 +80,8 @@ public class BundleTaskCreator
     public void init(final BundleContext bc, final ResourceChangeListener listener, final RetryHandler retryHandler) {
         this.bundleContext = bc;
         this.retryHandler = retryHandler;
-
+        
+        this.isMultiVersion = Boolean.TRUE.equals(Boolean.valueOf(bc.getProperty("sling.installer.multiversion")));
         this.bundleContext.addBundleListener(this);
         this.bundleContext.addFrameworkListener(this);
 
@@ -231,10 +234,15 @@ public class BundleTaskCreator
                     logger.info(message);
                     result = new ChangeStateTask(resourceList, ResourceState.IGNORED, message);
                 } else {
+                    
+                    // if not isMultiVersion for install and update, we want the bundle with the
+                    // highest version - otherwise only check for very same version (potential updates of snapshots)
+                    String bundleVersion = null;
+                    if (this.isMultiVersion) {
+                        bundleVersion = newVersion.toString();
+                    } 
 
-                    // for install and update, we want the bundle with the
-                    // highest version
-                    final BundleInfo info = this.getBundleInfo(symbolicName, null);
+                    final BundleInfo info = this.getBundleInfo(symbolicName, bundleVersion);
 
                     // check if we should start the bundle as we installed it in the previous run
                     if (info == null) {

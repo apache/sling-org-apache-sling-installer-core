@@ -42,13 +42,15 @@ public class DefaultTransformer
 
     /** Logger */
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    
+    private boolean isMultiVersion;
 
     /**
      * @see org.apache.sling.installer.core.impl.InternalService#init(org.osgi.framework.BundleContext, org.apache.sling.installer.api.ResourceChangeListener, RetryHandler)
      */
     @Override
     public void init(final BundleContext bctx, final ResourceChangeListener rcl, RetryHandler retryHandler) {
-        // nothing to do
+        this.isMultiVersion = Boolean.TRUE.equals(Boolean.valueOf(bctx.getProperty("sling.installer.multiversion")));
     }
 
     /**
@@ -113,7 +115,7 @@ public class DefaultTransformer
                 }
 
                 final TransformationResult tr = new TransformationResult();
-                tr.setId(headers.symbolicName);
+                tr.setId(headers.symbolicName + (isMultiVersion ? "-"+headers.version : ""));
                 tr.setResourceType(InstallableResource.TYPE_BUNDLE);
                 tr.setAttributes(attr);
 
