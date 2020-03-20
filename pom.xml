@@ -28,7 +28,7 @@
     </parent>
 
     <artifactId>org.apache.sling.installer.core</artifactId>
-    <version>3.11.0-SNAPSHOT</version>
+    <version>3.11.0</version>
 
     <name>Apache Sling Installer Core</name>
     <description> 
@@ -38,14 +38,14 @@
 
     <properties>
         <sling.java.version>8</sling.java.version>
-        <project.build.outputTimestamp>2020-02-25T13:37:42Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2020-03-20T17:04:26Z</project.build.outputTimestamp>
     </properties>
 
     <scm>
         <connection>scm:git:https://gitbox.apache.org/repos/asf/sling-org-apache-sling-installer-core.git</connection>
         <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/sling-org-apache-sling-installer-core.git</developerConnection>
         <url>https://gitbox.apache.org/repos/asf?p=sling-org-apache-sling-installer-core.git</url>
-        <tag>HEAD</tag>
+        <tag>org.apache.sling.installer.core-3.11.0</tag>
     </scm>
 
     <build>
