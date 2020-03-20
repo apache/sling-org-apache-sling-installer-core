@@ -42,7 +42,7 @@ public class DefaultTransformer
 
     /** Logger */
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    
+
     private boolean isMultiVersion;
 
     /**
@@ -50,7 +50,7 @@ public class DefaultTransformer
      */
     @Override
     public void init(final BundleContext bctx, final ResourceChangeListener rcl, RetryHandler retryHandler) {
-        this.isMultiVersion = Boolean.TRUE.equals(Boolean.valueOf(bctx.getProperty("sling.installer.multiversion")));
+        this.isMultiVersion = OsgiInstallerImpl.isMultiVersionSupportEnabled(bctx);
     }
 
     /**

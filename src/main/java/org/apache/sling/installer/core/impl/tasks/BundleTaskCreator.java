@@ -33,6 +33,7 @@ import org.apache.sling.installer.api.tasks.TaskResourceGroup;
 import org.apache.sling.installer.core.impl.BundleBlackList;
 import org.apache.sling.installer.core.impl.EntityResourceList;
 import org.apache.sling.installer.core.impl.InternalService;
+import org.apache.sling.installer.core.impl.OsgiInstallerImpl;
 import org.apache.sling.installer.core.impl.PersistentResourceList;
 import org.apache.sling.installer.core.impl.RegisteredResourceImpl;
 import org.apache.sling.installer.core.impl.Util;
@@ -80,8 +81,8 @@ public class BundleTaskCreator
     public void init(final BundleContext bc, final ResourceChangeListener listener, final RetryHandler retryHandler) {
         this.bundleContext = bc;
         this.retryHandler = retryHandler;
-        
-        this.isMultiVersion = Boolean.TRUE.equals(Boolean.valueOf(bc.getProperty("sling.installer.multiversion")));
+
+        this.isMultiVersion = OsgiInstallerImpl.isMultiVersionSupportEnabled(bc);
         this.bundleContext.addBundleListener(this);
         this.bundleContext.addFrameworkListener(this);
 
@@ -234,13 +235,13 @@ public class BundleTaskCreator
                     logger.info(message);
                     result = new ChangeStateTask(resourceList, ResourceState.IGNORED, message);
                 } else {
-                    
+
                     // if not isMultiVersion for install and update, we want the bundle with the
                     // highest version - otherwise only check for very same version (potential updates of snapshots)
                     String bundleVersion = null;
                     if (this.isMultiVersion) {
                         bundleVersion = newVersion.toString();
-                    } 
+                    }
 
                     final BundleInfo info = this.getBundleInfo(symbolicName, bundleVersion);
 

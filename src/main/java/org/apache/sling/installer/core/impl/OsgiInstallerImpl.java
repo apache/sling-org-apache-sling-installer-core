@@ -91,6 +91,11 @@ implements OsgiInstaller, ResourceChangeListener, RetryHandler, InfoProvider, Ru
     private static final String PROP_START_LEVEL_HANDLING = "sling.installer.switchstartlevel";
 
     /**
+     * Property to enable experimental multi version support
+     */
+    private static final String PROP_EXPERIMENTAL_MULTI_VERSION_SUPPORT = "sling.installer.experimental.multiversion";
+
+    /**
      * The name of the framework property setting required services
      */
     private static final String PROP_REQUIRED_SERVICES = "sling.installer.requiredservices";
@@ -1642,5 +1647,11 @@ implements OsgiInstaller, ResourceChangeListener, RetryHandler, InfoProvider, Ru
             }
             up.update(groups);
         }
+    }
+
+    public static boolean isMultiVersionSupportEnabled(final BundleContext bundleContext) {
+        return Converters.standardConverter()
+              .convert(bundleContext.getProperty(OsgiInstallerImpl.PROP_EXPERIMENTAL_MULTI_VERSION_SUPPORT))
+              .defaultValue(false).to(Boolean.class);
     }
 }
