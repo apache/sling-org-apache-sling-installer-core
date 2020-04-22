@@ -25,20 +25,19 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.Dictionary;
 
-import org.apache.sling.feature.io.ConfiguratorUtil;
+import org.apache.felix.cm.json.Configurations;
 import org.apache.sling.installer.api.serializer.ConfigurationSerializer;
 
 /** Serializes dictionary configuration objects (as specified in the configuration admin) into JSON format.
- * 
+ *
  * @see <a href="https://osgi.org/specification/osgi.cmpn/7.0.0/service.configurator.html">OSGi Configurator Spec</a>
- * @see <a href=
- *      "https://github.com/apache/felix/blob/trunk/configurator/src/main/java/org/apache/felix/configurator/impl/json/JSONUtil.java">JSONUtil</a> */
+ */
 public class JsonConfigurationSerializer implements ConfigurationSerializer {
 
     @Override
     public void serialize(Dictionary<String, Object> dictionary, OutputStream outputStream) throws IOException {
         Writer writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
-        ConfiguratorUtil.writeConfiguration(writer, dictionary);
+        Configurations.buildWriter().build(writer).writeConfiguration(dictionary);
         writer.flush();
         // do not close the writer to prevent closing the underlying outputstream
     }

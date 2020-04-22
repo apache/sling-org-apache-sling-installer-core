@@ -1,7 +1,3 @@
--includeresource: @org.apache.felix.configadmin-[0-9.]*.jar!/org/apache/felix/cm/file/ConfigurationHandler.*,\
-                  @org.apache.sling.feature.io-[0-9.]*.jar!/org/apache/sling/feature/io/ConfiguratorUtil.*,\
-                  @org.apache.sling.feature.io-[0-9.]*.jar!/org/apache/sling/feature/io/CloseShieldWriter.*
--conditionalpackage: org.apache.felix.configurator.impl.json,\
-                     org.apache.felix.configurator.impl.model
+-includeresource: @org.apache.felix.configadmin-[0-9.]*.jar!/org/apache/felix/cm/file/ConfigurationHandler.*
 Provide-Capability:  osgi.service;objectClass:List<String>="org.apache.sling.installer.api.OsgiInstaller,org.apache.sling.installer.api.ResourceChangeListener,org.apache.sling.installer.api.info.InfoProvider,org.apache.sling.installer.api.tasks.RetryHandler",\
                      osgi.service;objectClass:List<String>="org.apache.sling.installer.api.event.InstallationListener,org.apache.sling.installer.api.jmx.InstallerMBean"

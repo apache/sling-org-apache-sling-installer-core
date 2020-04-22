@@ -19,13 +19,12 @@
 package org.apache.sling.installer.core.impl;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URI;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -34,9 +33,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.felix.cm.file.ConfigurationHandler;
-import org.apache.felix.configurator.impl.json.JSONUtil;
-import org.apache.felix.configurator.impl.json.TypeConverter;
-import org.apache.felix.configurator.impl.model.ConfigurationFile;
+import org.apache.felix.cm.json.Configurations;
 import org.apache.sling.installer.api.InstallableResource;
 
 /**
@@ -231,7 +228,6 @@ public class InternalResource extends InstallableResource {
             final InputStream is, final String scheme, final String id)
     throws IOException {
         if ( id.endsWith(".cfg.json") ) {
-            final String name = scheme.concat(":").concat(id);
             String configId;
             int pos = id.lastIndexOf('/');
             if ( pos == -1 ) {
@@ -245,48 +241,12 @@ public class InternalResource extends InstallableResource {
             }
             configId = removeConfigExtension(configId);
 
-            final TypeConverter typeConverter = new TypeConverter(null);
-            final JSONUtil.Report report = new JSONUtil.Report();
-
             // read from input stream
-            final String contents;
-            try(final BufferedReader buf = new BufferedReader(
-                        new InputStreamReader(is, "UTF-8"))) {
+            try(final Reader reader =  new InputStreamReader(is, "UTF-8")) {
+                return Configurations.buildReader()
+                        .withIdentifier(configId).build(reader).readConfiguration();
 
-                final StringBuilder sb = new StringBuilder();
-
-                sb.append("{ \"");
-                sb.append(configId);
-                sb.append("\" : ");
-                String line;
-
-                while ((line = buf.readLine()) != null) {
-                    sb.append(line);
-                    sb.append('\n');
-                }
-                sb.append("}");
-
-                contents = sb.toString();
             }
-
-            final URL url = new URL("file://" + configId);
-
-            final ConfigurationFile config = JSONUtil.readJSON(typeConverter, name, url, 0, contents, report);
-
-            if ( !report.errors.isEmpty() || !report.warnings.isEmpty() ) {
-                final StringBuilder builder = new StringBuilder();
-                builder.append("Errors in configuration:");
-                for(final String w : report.warnings) {
-                    builder.append("\n");
-                    builder.append(w);
-                }
-                for(final String e : report.errors) {
-                    builder.append("\n");
-                    builder.append(e);
-                }
-                throw new IOException(builder.toString());
-            }
-            return config.getConfigurations().get(0).getProperties();
 
         } else {
             final Hashtable<String, Object> ht = new Hashtable<>();
