@@ -1250,7 +1250,7 @@ implements OsgiInstaller, ResourceChangeListener, RetryHandler, InfoProvider, Ru
                     }
                 }
 
-                if ( !done ) {
+                if ( !done && persistChange) {
                     // create
                     final List<UpdateHandler> handlerList = this.updateHandlerTracker.getSortedServices();
                     for(final UpdateHandler handler : handlerList) {
