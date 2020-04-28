@@ -80,6 +80,11 @@ public class ConfigurationSerializerTest {
                 String actualLine = actualLineIterator.nextLine();
                 // ignore lines starting with "*"
                 if (!expectedLine.equals("*")) {
+                    // XML output differs between Java 1.8 and Java 11
+                    if ( expectedLine.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"") &&
+                         actualLine.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"") ) {
+                        continue;
+                    }
                     Assert.assertEquals(expectedLine, actualLine);
                 }
             }
