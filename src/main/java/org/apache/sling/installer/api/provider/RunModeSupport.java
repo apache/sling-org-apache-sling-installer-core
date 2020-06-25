@@ -31,11 +31,28 @@ public final class RunModeSupport {
         // not supposed to be instantiated
     }
 
-    public static int getMatchingRunmodesFromDisjunctions(String disjunctions, Set<String> activeRunModes) {
+    /**
+     * Checks if a given run mode string is satisfied by the given active run modes.
+     * A run mode string consists out of run modes and operators (AND = ".", OR = "," and NOT = "-")
+     * The run mode string follows the following grammar in EBNF:
+     * <pre><code>
+     * run mode string ::= disjunctions
+     * disjunctions ::= conjunctions { "," conjunctions }
+     * conjunctions ::= conjunction { '.' conjunction }
+     * conjunction ::= notrunmode | runmode
+     * notrunmode ::= '-' runmode
+     * </code></pre>
+     * 
+     * The operator order is first "-" (not), second "." (AND), last "," (OR).
+     * @param disjunctions the expected run mode string to check
+     * @param activeRunModes the run modes against which to check
+     * @return the number of matching run modes or 0 if no match. If multiple disjunctions match the one with the highest number of matching run modes is returned.
+     */
+    public static int getNumberOfMatchingRunmodesFromDisjunctions(String disjunctions, Set<String> activeRunModes) {
         int numMatchingRunModes = 0;
         // 1. support OR
         for (String discjunctivePart : disjunctions.split(Pattern.quote(OR_SEPARATOR))) {
-            int newNumMatchingRunModes = getMatchingRunModesFromConjunctions(discjunctivePart, activeRunModes);
+            int newNumMatchingRunModes = getNumberOfMatchingRunModesFromConjunctions(discjunctivePart, activeRunModes);
             if (newNumMatchingRunModes > numMatchingRunModes) {
                 numMatchingRunModes = newNumMatchingRunModes;
             }
@@ -43,7 +60,7 @@ public final class RunModeSupport {
         return numMatchingRunModes;
     }
 
-    private static int getMatchingRunModesFromConjunctions(String conjunctions, Set<String> activeRunModes) {
+    private static int getNumberOfMatchingRunModesFromConjunctions(String conjunctions, Set<String> activeRunModes) {
         int numMatchingRunModes = 0;
         // 2. support AND
         for (String conjunctivePart : conjunctions.split(Pattern.quote(AND_SEPARATOR))) {

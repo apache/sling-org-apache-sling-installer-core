@@ -29,11 +29,11 @@ public class RunModeSupportTest {
 
     @Test
     public void testGetMatchingRunmodesFromName() {
-        Assert.assertEquals(0, RunModeSupport.getMatchingRunmodesFromDisjunctions("test1.test2,-test3.test4", Collections.singleton("test5")));
-        Assert.assertEquals(0, RunModeSupport.getMatchingRunmodesFromDisjunctions("test1.test2,-test3.test4", Stream.of("test1", "test3").collect(Collectors.toSet())));
-        Assert.assertEquals(0, RunModeSupport.getMatchingRunmodesFromDisjunctions("test1.test2,-test3.test4", Stream.of("test2", "test3").collect(Collectors.toSet())));
-        Assert.assertEquals(2, RunModeSupport.getMatchingRunmodesFromDisjunctions("test1.test2,-test3.test4", Stream.of("test1", "test2").collect(Collectors.toSet())));
-        Assert.assertEquals(2, RunModeSupport.getMatchingRunmodesFromDisjunctions("test1.test2,-test3.test4", Stream.of("test2", "test4").collect(Collectors.toSet())));
-        Assert.assertEquals(3, RunModeSupport.getMatchingRunmodesFromDisjunctions("test1.test2,-test3.test4,test5.test6.test7", Stream.of("test1", "test2", "test4", "test5", "test6", "test7").collect(Collectors.toSet())));
+        Assert.assertEquals(0, RunModeSupport.getNumberOfMatchingRunmodesFromDisjunctions("test1.test2,-test3.test4", Collections.singleton("test5")));
+        Assert.assertEquals(0, RunModeSupport.getNumberOfMatchingRunmodesFromDisjunctions("test1.test2,-test3.test4", Stream.of("test1", "test3").collect(Collectors.toSet())));
+        Assert.assertEquals(0, RunModeSupport.getNumberOfMatchingRunmodesFromDisjunctions("test1.test2,-test3.test4", Stream.of("test2", "test3").collect(Collectors.toSet())));
+        Assert.assertEquals(2, RunModeSupport.getNumberOfMatchingRunmodesFromDisjunctions("test1.test2,-test3.test4", Stream.of("test1", "test2").collect(Collectors.toSet())));
+        Assert.assertEquals(2, RunModeSupport.getNumberOfMatchingRunmodesFromDisjunctions("test1.test2,-test3.test4", Stream.of("test2", "test4").collect(Collectors.toSet())));
+        Assert.assertEquals(3, RunModeSupport.getNumberOfMatchingRunmodesFromDisjunctions("test1.test2,-test3.test4,test5.test6.test7", Stream.of("test1", "test2", "test4", "test5", "test6", "test7").collect(Collectors.toSet())));
     }
 }
