@@ -3,3 +3,6 @@ Provide-Capability:  osgi.service;objectClass:List<String>="org.apache.sling.ins
                      osgi.service;objectClass:List<String>="org.apache.sling.installer.api.event.InstallationListener,org.apache.sling.installer.api.jmx.InstallerMBean"
 -conditionalpackage: org.apache.felix.cm.json.*
 Bundle-DocURL: https://sling.apache.org/documentation/bundles/osgi-installer.html
+# to make compatible with older Commons Johnzon (https://issues.apache.org/jira/browse/SLING-9218) remove the require-capability header
+-plugin: org.apache.sling.bnd.plugin.headers.parameters.remove.Plugin;\
+    'Require-Capability'='osgi.contract;osgi.contract=JavaJSONP;filter:="(&(osgi.contract=JavaJSONP)(version=1.1.0))"'
