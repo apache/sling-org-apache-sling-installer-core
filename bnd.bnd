@@ -1,3 +1,5 @@
 -includeresource: @org.apache.felix.configadmin-[0-9.]*.jar!/org/apache/felix/cm/file/ConfigurationHandler.*
 Provide-Capability:  osgi.service;objectClass:List<String>="org.apache.sling.installer.api.OsgiInstaller,org.apache.sling.installer.api.ResourceChangeListener,org.apache.sling.installer.api.info.InfoProvider,org.apache.sling.installer.api.tasks.RetryHandler",\
                      osgi.service;objectClass:List<String>="org.apache.sling.installer.api.event.InstallationListener,org.apache.sling.installer.api.jmx.InstallerMBean"
+-conditionalpackage: org.apache.felix.cm.json.*
+Bundle-DocURL: https://sling.apache.org/documentation/bundles/osgi-installer.html

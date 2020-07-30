@@ -71,12 +71,8 @@
                                     <shadedPattern>org.apache.sling.installer.core.impl.felix.cm</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>org.apache.sling.feature.io</pattern>
-                                    <shadedPattern>org.apache.sling.installer.core.impl.feature</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.apache.felix.configurator.impl</pattern>
-                                    <shadedPattern>org.apache.sling.installer.core.impl.configurator</shadedPattern>
+                                    <pattern>org.apache.felix.cm.json</pattern>
+                                    <shadedPattern>org.apache.sling.installer.core.impl.felix.cm.json</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
