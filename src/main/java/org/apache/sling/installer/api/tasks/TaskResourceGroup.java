@@ -18,6 +18,8 @@
  */
 package org.apache.sling.installer.api.tasks;
 
+import java.util.Iterator;
+
 import org.jetbrains.annotations.Nullable;
 
 import org.osgi.annotation.versioning.ProviderType;
@@ -34,6 +36,7 @@ public interface TaskResourceGroup {
      * Return the first resource if it either needs to be installed or uninstalled.
      * @return The task resource.
      */
+    @Nullable
     TaskResource getActiveResource();
 
     /**
@@ -42,7 +45,18 @@ public interface TaskResourceGroup {
      * @return The next task resource or {@code null}.
      * @since 1.1
      */
+    @Nullable
     TaskResource getNextActiveResource();
+
+    /**
+     * Return an iterator over all active resources in this group if there is more than just
+     * one active resourcew. The iterator does not allow to modify the group.
+     * @return An iterator for all active resources in this group or {code null} if there
+     *         is no or just one active resource.
+     * @since 1.6
+     */
+    @Nullable
+    Iterator<TaskResource> getActiveResourceIterator();
 
     /**
      * Set the finish state for the active resource.
