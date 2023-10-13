@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.apache.sling</groupId>
         <artifactId>sling-bundle-parent</artifactId>
-        <version>38</version>
+        <version>52</version>
         <relativePath />
     </parent>
 
@@ -102,7 +102,7 @@
                             <goal>run</goal>
                         </goals>
                         <configuration>
-                            <tasks name="Create a test bundle">
+                            <target name="Create a test bundle">
                                 <jar destfile="${project.build.directory}/${project.artifactId}-${project.version}-testbundle-1.0.jar">
                                     <fileset dir="${project.build.directory}/classes">
                                         <include name="META-INF/**" />
@@ -114,7 +114,7 @@
                                         <attribute name="Bundle-Version" value="1.0.4" />
                                     </manifest>
                                 </jar>
-                            </tasks>
+                            </target>
                         </configuration>
                     </execution>
                 </executions>
@@ -199,6 +199,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
@@ -223,10 +224,12 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.jmock</groupId>
