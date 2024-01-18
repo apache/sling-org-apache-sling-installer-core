@@ -25,7 +25,7 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.Dictionary;
 
-import org.apache.felix.cm.json.Configurations;
+import org.apache.felix.cm.json.io.Configurations;
 import org.apache.sling.installer.api.serializer.ConfigurationSerializer;
 
 /** Serializes dictionary configuration objects (as specified in the configuration admin) into JSON format.

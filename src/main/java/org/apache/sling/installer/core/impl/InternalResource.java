@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.felix.cm.file.ConfigurationHandler;
-import org.apache.felix.cm.json.Configurations;
+import org.apache.felix.cm.json.io.Configurations;
 import org.apache.sling.installer.api.InstallableResource;
 
 /**
