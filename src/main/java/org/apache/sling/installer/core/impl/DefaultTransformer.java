@@ -37,8 +37,7 @@ import org.slf4j.LoggerFactory;
  * The default transformer transforms:
  * - file resources containing a bundle into OSGI bundle resources
  */
-public class DefaultTransformer
-    implements InternalService, ResourceTransformer {
+public class DefaultTransformer implements InternalService, ResourceTransformer {
 
     /** Logger */
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -75,7 +74,7 @@ public class DefaultTransformer
     @Override
     public TransformationResult[] transform(final RegisteredResource resource) {
         logger.debug("Trying to transform {} : {}", resource, resource.getType());
-        if ( resource.getType().equals(InstallableResource.TYPE_FILE) ) {
+        if (resource.getType().equals(InstallableResource.TYPE_FILE)) {
             return checkBundle(resource);
         }
         logger.debug("Unsupported type {} : {}", resource, resource.getType());
@@ -94,28 +93,29 @@ public class DefaultTransformer
         logger.debug("Checking headers for {}", resource);
         final Util.BundleHeaders headers = Util.readBundleHeaders(resource, logger);
         logger.debug("Found headers for {} : {}", resource, headers);
-        if ( headers != null ) {
+        if (headers != null) {
             // check the version for validity
             boolean validVersion = true;
             try {
                 new Version(headers.version);
             } catch (final IllegalArgumentException iae) {
-                logger.info("Rejecting bundle {} from {} due to invalid version information: {}.",
+                logger.info(
+                        "Rejecting bundle {} from {} due to invalid version information: {}.",
                         new Object[] {headers.symbolicName, resource, headers.version});
                 validVersion = false;
             }
-            if ( validVersion ) {
+            if (validVersion) {
                 final Map<String, Object> attr = new HashMap<String, Object>();
                 attr.put(Constants.BUNDLE_SYMBOLICNAME, headers.symbolicName);
                 attr.put(Constants.BUNDLE_VERSION, headers.version);
 
                 // check for activation policy
-                if ( headers.activationPolicy != null ) {
+                if (headers.activationPolicy != null) {
                     attr.put(Constants.BUNDLE_ACTIVATIONPOLICY, headers.activationPolicy);
                 }
 
                 final TransformationResult tr = new TransformationResult();
-                tr.setId(headers.symbolicName + (isMultiVersion ? "-"+headers.version : ""));
+                tr.setId(headers.symbolicName + (isMultiVersion ? "-" + headers.version : ""));
                 tr.setResourceType(InstallableResource.TYPE_BUNDLE);
                 tr.setAttributes(attr);
 

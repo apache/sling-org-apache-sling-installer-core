@@ -21,7 +21,6 @@ package org.apache.sling.installer.api;
 import java.io.InputStream;
 import java.util.Dictionary;
 
-
 /**
  * A piece of data that can be installed by the {@link OsgiInstaller}
  * Currently the OSGi installer supports bundles and configurations,
@@ -157,18 +156,19 @@ public class InstallableResource {
      *                 is used
      * @throws IllegalArgumentException if something is wrong
      */
-    public InstallableResource(final String id,
+    public InstallableResource(
+            final String id,
             final InputStream is,
             final Dictionary<String, Object> dict,
             final String digest,
             final String type,
             final Integer priority) {
-        if ( id == null ) {
+        if (id == null) {
             throw new IllegalArgumentException("id must not be null.");
         }
-        if ( is == null ) {
+        if (is == null) {
             // if input stream is null, config through dictionary is expected!
-            if ( dict == null ) {
+            if (dict == null) {
                 throw new IllegalArgumentException("dictionary must not be null (or input stream must not be null).");
             }
         }

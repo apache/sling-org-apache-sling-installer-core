@@ -34,20 +34,28 @@ public class InstallListener implements InstallationListener {
     private static final InstallationEvent START_EVENT = new InstallationEvent() {
 
         @Override
-        public TYPE getType() { return TYPE.STARTED; }
+        public TYPE getType() {
+            return TYPE.STARTED;
+        }
 
         @Override
-        public Object getSource() { return null; }
+        public Object getSource() {
+            return null;
+        }
     };
 
     /** Suspend event. */
     private static final InstallationEvent SUSPENDED_EVENT = new InstallationEvent() {
 
         @Override
-        public TYPE getType() { return TYPE.SUSPENDED; }
+        public TYPE getType() {
+            return TYPE.SUSPENDED;
+        }
 
         @Override
-        public Object getSource() { return null; }
+        public Object getSource() {
+            return null;
+        }
     };
 
     /** Service tracker for the listeners. */
@@ -80,21 +88,21 @@ public class InstallListener implements InstallationListener {
      */
     @Override
     public void onEvent(final InstallationEvent event) {
-        if ( this.logger.isDebugEnabled() ) {
-            if ( event.getType() == InstallationEvent.TYPE.STARTED ) {
+        if (this.logger.isDebugEnabled()) {
+            if (event.getType() == InstallationEvent.TYPE.STARTED) {
                 logger.debug("onEvent(STARTED).");
-            } else if ( event.getType() == InstallationEvent.TYPE.SUSPENDED ) {
+            } else if (event.getType() == InstallationEvent.TYPE.SUSPENDED) {
                 logger.debug("onEvent(SUSPENDED).");
             } else {
-                final TaskResource src = (TaskResource)event.getSource();
+                final TaskResource src = (TaskResource) event.getSource();
                 logger.debug("onEvent(event.getSource(): {})", src);
             }
         }
         final Object[] listeners = this.tracker.getServices();
-        if ( listeners != null ) {
-            for(final Object l : listeners) {
-                if ( l instanceof InstallationListener ) {
-                    ((InstallationListener)l).onEvent(event);
+        if (listeners != null) {
+            for (final Object l : listeners) {
+                if (l instanceof InstallationListener) {
+                    ((InstallationListener) l).onEvent(event);
                 }
             }
         }
@@ -104,7 +112,7 @@ public class InstallListener implements InstallationListener {
      * Send started event.
      */
     public synchronized void start() {
-        if ( ! this.started ) {
+        if (!this.started) {
             this.logger.debug("Starting new installer cycle");
             this.started = true;
             this.onEvent(START_EVENT);
@@ -115,7 +123,7 @@ public class InstallListener implements InstallationListener {
      * Send suspended event.
      */
     public synchronized void suspend() {
-        if ( this.started ) {
+        if (this.started) {
             this.started = false;
             this.onEvent(SUSPENDED_EVENT);
         }

@@ -42,13 +42,11 @@ public class SortingServiceTracker<T> extends ServiceTracker<T, T> {
 
     /**
      * Constructor
-     * 
+     *
      * @param context Bundle context
      * @param clazz   Class
      */
-    public SortingServiceTracker(final BundleContext context,
-            final String clazz,
-            final RetryHandler listener) {
+    public SortingServiceTracker(final BundleContext context, final String clazz, final RetryHandler listener) {
         super(context, clazz, null);
         this.listener = listener;
     }
@@ -82,7 +80,7 @@ public class SortingServiceTracker<T> extends ServiceTracker<T, T> {
         this.sortedServiceCache = null;
         this.sortedReferences = null;
         T returnValue = context.getService(reference);
-        if ( listener != null ) {
+        if (listener != null) {
             // new factory or resource transformer has been added, wake up main thread
             this.listener.scheduleRetry();
         }
@@ -91,7 +89,7 @@ public class SortingServiceTracker<T> extends ServiceTracker<T, T> {
 
     /**
      * Return a sorted list of the services.
-     * 
+     *
      * @return Service list
      */
     public List<T> getSortedServices() {
@@ -118,7 +116,7 @@ public class SortingServiceTracker<T> extends ServiceTracker<T, T> {
 
     /**
      * Return a sorted list of the services references.
-     * 
+     *
      * @return Service list
      */
     public List<ServiceReference<T>> getSortedServiceReferences() {
@@ -142,16 +140,16 @@ public class SortingServiceTracker<T> extends ServiceTracker<T, T> {
 
     /**
      * Check if a service with the given name is registered.
-     * 
+     *
      * @param name Name
      * @return {@code true} if it exists, {@code false} otherwise.
      */
     public boolean check(final String key, final String name) {
         final ServiceReference<T>[] refs = this.getServiceReferences();
-        if ( refs != null ) {
+        if (refs != null) {
             for (final ServiceReference<T> ref : refs) {
                 final Object val = ref.getProperty(key);
-                if ( name.equals(val) ) {
+                if (name.equals(val)) {
                     return true;
                 }
             }

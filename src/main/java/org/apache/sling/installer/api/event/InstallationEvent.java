@@ -20,7 +20,6 @@ package org.apache.sling.installer.api.event;
 
 import org.osgi.annotation.versioning.ProviderType;
 
-
 /**
  * Optional listener which can be used to monitor the activities
  * of the installer.

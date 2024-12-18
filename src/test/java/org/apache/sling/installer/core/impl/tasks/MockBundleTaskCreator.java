@@ -41,7 +41,7 @@ class MockBundleTaskCreator extends BundleTaskCreator {
     @Override
     protected BundleInfo getBundleInfo(String symbolicName, String version) {
         BundleInfo info = fakeBundleInfo.get(symbolicName);
-        if ( version == null || info.version.compareTo(new Version(version)) == 0 ) {
+        if (version == null || info.version.compareTo(new Version(version)) == 0) {
             return info;
         }
         return null;

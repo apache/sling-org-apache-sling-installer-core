@@ -54,11 +54,13 @@ public class PersistentResourceList {
 
     /** Entity id for restart active bundles. */
     public static final String RESTART_ACTIVE_BUNDLES_TYPE = "org.apache.sling.installer.core.restart.bundles";
+
     public static final String RESTART_ACTIVE_BUNDLES_ID = "org.apache.sling.installer.core.restart.bundles";
-    public static final String RESTART_ACTIVE_BUNDLES_ENTITY_ID = RESTART_ACTIVE_BUNDLES_TYPE + ':' + RESTART_ACTIVE_BUNDLES_ID;
+    public static final String RESTART_ACTIVE_BUNDLES_ENTITY_ID =
+            RESTART_ACTIVE_BUNDLES_TYPE + ':' + RESTART_ACTIVE_BUNDLES_ID;
 
     /** The logger */
-    private final Logger logger =  LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
      * Map of registered resource sets.
@@ -83,15 +85,15 @@ public class PersistentResourceList {
 
         Map<String, EntityResourceList> restoredData = null;
         List<RegisteredResource> unknownList = null;
-        if ( dataFile.exists() ) {
+        if (dataFile.exists()) {
             ObjectInputStream ois = null;
             try {
                 ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(dataFile)));
                 final int version = ois.readInt();
-                if ( version > 0 && version <= VERSION ) {
-                    restoredData = (Map<String, EntityResourceList>)ois.readObject();
-                    if ( version == VERSION ) {
-                        unknownList = (List<RegisteredResource>)ois.readObject();
+                if (version > 0 && version <= VERSION) {
+                    restoredData = (Map<String, EntityResourceList>) ois.readObject();
+                    if (version == VERSION) {
+                        unknownList = (List<RegisteredResource>) ois.readObject();
                     }
                 } else {
                     logger.warn("Unknown version for persistent resource list: {}", version);
@@ -118,20 +120,24 @@ public class PersistentResourceList {
         this.updateCache();
 
         // update resource ids
-        for(final Map.Entry<String, EntityResourceList> entry : this.data.entrySet()) {
+        for (final Map.Entry<String, EntityResourceList> entry : this.data.entrySet()) {
             final EntityResourceList erl = entry.getValue();
             erl.setResourceId(entry.getKey());
             erl.setListener(listener);
         }
 
         // check for special resources
-        if ( this.getEntityResourceList(RESTART_ACTIVE_BUNDLES_ENTITY_ID) == null ) {
-            final RegisteredResource rr = this.addOrUpdate(new InternalResource("$sling-installer$",
-                            RESTART_ACTIVE_BUNDLES_ID,
-                            null,
-                            new Hashtable<String, Object>(),
-                            InstallableResource.TYPE_PROPERTIES, "1",
-                            null, null, null));
+        if (this.getEntityResourceList(RESTART_ACTIVE_BUNDLES_ENTITY_ID) == null) {
+            final RegisteredResource rr = this.addOrUpdate(new InternalResource(
+                    "$sling-installer$",
+                    RESTART_ACTIVE_BUNDLES_ID,
+                    null,
+                    new Hashtable<String, Object>(),
+                    InstallableResource.TYPE_PROPERTIES,
+                    "1",
+                    null,
+                    null,
+                    null));
             final TransformationResult result = new TransformationResult();
             result.setId(RESTART_ACTIVE_BUNDLES_ID);
             result.setResourceType(RESTART_ACTIVE_BUNDLES_TYPE);
@@ -143,16 +149,18 @@ public class PersistentResourceList {
      * Update the url to digest cache
      */
     private void updateCache() {
-        for(final EntityResourceList group : this.data.values()) {
-            for(final RegisteredResource rr : group.listResources()) {
-                if ( ((RegisteredResourceImpl)rr).hasDataFile() ) {
-                    FileDataStore.SHARED.updateDigestCache(rr.getURL(), ((RegisteredResourceImpl)rr).getDataFile(), rr.getDigest());
+        for (final EntityResourceList group : this.data.values()) {
+            for (final RegisteredResource rr : group.listResources()) {
+                if (((RegisteredResourceImpl) rr).hasDataFile()) {
+                    FileDataStore.SHARED.updateDigestCache(
+                            rr.getURL(), ((RegisteredResourceImpl) rr).getDataFile(), rr.getDigest());
                 }
             }
         }
-        for(final RegisteredResource rr : this.untransformedResources ) {
-            if ( ((RegisteredResourceImpl)rr).hasDataFile() ) {
-                FileDataStore.SHARED.updateDigestCache(rr.getURL(), ((RegisteredResourceImpl)rr).getDataFile(), rr.getDigest());
+        for (final RegisteredResource rr : this.untransformedResources) {
+            if (((RegisteredResourceImpl) rr).hasDataFile()) {
+                FileDataStore.SHARED.updateDigestCache(
+                        rr.getURL(), ((RegisteredResourceImpl) rr).getDataFile(), rr.getDigest());
             }
         }
     }
@@ -162,7 +170,8 @@ public class PersistentResourceList {
      */
     public void save() {
         try {
-            final ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(dataFile)));
+            final ObjectOutputStream oos =
+                    new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(dataFile)));
             try {
                 oos.writeInt(VERSION);
                 oos.writeObject(data);
@@ -186,19 +195,19 @@ public class PersistentResourceList {
      */
     public RegisteredResource addOrUpdate(final InternalResource input) {
         // first check untransformed resource if there are resources with the same url and digest
-        for(final RegisteredResource rr : this.untransformedResources ) {
-            if ( rr.getURL().equals(input.getURL()) && ( rr.getDigest().equals(input.getDigest())) ) {
+        for (final RegisteredResource rr : this.untransformedResources) {
+            if (rr.getURL().equals(input.getURL()) && (rr.getDigest().equals(input.getDigest()))) {
                 // if we found the resource we can return after updating
-                ((RegisteredResourceImpl)rr).update(input);
+                ((RegisteredResourceImpl) rr).update(input);
                 return rr;
             }
         }
         // installed resources are next
-        for(final EntityResourceList group : this.data.values()) {
-            for(final RegisteredResource rr : group.listResources()) {
-                if ( rr.getURL().equals(input.getURL()) && ( rr.getDigest().equals(input.getDigest()))) {
+        for (final EntityResourceList group : this.data.values()) {
+            for (final RegisteredResource rr : group.listResources()) {
+                if (rr.getURL().equals(input.getURL()) && (rr.getDigest().equals(input.getDigest()))) {
                     // if we found the resource we can return after updating
-                    ((RegisteredResourceImpl)rr).update(input);
+                    ((RegisteredResourceImpl) rr).update(input);
                     return rr;
                 }
             }
@@ -218,8 +227,8 @@ public class PersistentResourceList {
      * known resource type)
      */
     private void checkInstallable(final RegisteredResourceImpl input) {
-        if ( !InstallableResource.TYPE_FILE.equals(input.getType())
-             && !InstallableResource.TYPE_PROPERTIES.equals(input.getType()) ) {
+        if (!InstallableResource.TYPE_FILE.equals(input.getType())
+                && !InstallableResource.TYPE_PROPERTIES.equals(input.getType())) {
 
             EntityResourceList t = this.data.get(input.getEntityId());
             if (t == null) {
@@ -230,7 +239,7 @@ public class PersistentResourceList {
             t.addOrUpdate(input);
         } else {
             // check if there is an old resource and remove it first
-            if ( this.untransformedResources.contains(input) ) {
+            if (this.untransformedResources.contains(input)) {
                 this.untransformedResources.remove(input);
             }
             this.untransformedResources.add(input);
@@ -252,16 +261,16 @@ public class PersistentResourceList {
     public void remove(final String url) {
         // iterate over all resource groups and remove resources
         // with the given url
-        for(final EntityResourceList group : this.data.values()) {
+        for (final EntityResourceList group : this.data.values()) {
             group.remove(url);
         }
         // iterate over untransformed resources and remove
         // the resource with that url
         final Iterator<RegisteredResource> i = this.untransformedResources.iterator();
-        while ( i.hasNext() ) {
+        while (i.hasNext()) {
             final RegisteredResource rr = i.next();
-            if ( rr.getURL().equals(url) ) {
-                ((RegisteredResourceImpl)rr).cleanup();
+            if (rr.getURL().equals(url)) {
+                ((RegisteredResourceImpl) rr).cleanup();
                 i.remove();
                 break;
             }
@@ -273,9 +282,9 @@ public class PersistentResourceList {
      */
     public EntityResourceList getEntityResourceList(final String entityId) {
         EntityResourceList erl = this.data.get(entityId);
-        if ( erl == null ) {
-            for(final EntityResourceList group : this.data.values()) {
-                if ( entityId.equals(group.getFullAlias()) ) {
+        if (erl == null) {
+            for (final EntityResourceList group : this.data.values()) {
+                if (entityId.equals(group.getFullAlias())) {
                     erl = group;
                     break;
                 }
@@ -290,12 +299,13 @@ public class PersistentResourceList {
      */
     public boolean compact() {
         boolean startNewCycle = false;
-        final Iterator<Map.Entry<String, EntityResourceList>> i = this.data.entrySet().iterator();
-        while ( i.hasNext() ) {
+        final Iterator<Map.Entry<String, EntityResourceList>> i =
+                this.data.entrySet().iterator();
+        while (i.hasNext()) {
             final Map.Entry<String, EntityResourceList> entry = i.next();
 
             startNewCycle |= entry.getValue().compact();
-            if ( entry.getValue().isEmpty() ) {
+            if (entry.getValue().isEmpty()) {
                 i.remove();
             }
         }
@@ -305,32 +315,37 @@ public class PersistentResourceList {
     /**
      * Transform an unknown resource to a registered one
      */
-    public void transform(final RegisteredResource resource,
-                          final TransformationResult[] result) {
+    public void transform(final RegisteredResource resource, final TransformationResult[] result) {
         // remove resource from unknown list
         this.untransformedResources.remove(resource);
         try {
             Set<String> entityIds = new HashSet<>();
-            for(int i=0; i<result.length; i++) {
+            for (int i = 0; i < result.length; i++) {
                 // check the result
                 final TransformationResult tr = result[i];
-                if ( tr == null ) {
+                if (tr == null) {
                     logger.warn("Ignoring null result for {}", resource);
                     continue;
                 }
-                if ( tr.getResourceType() != null && tr.getId() == null) {
-                    logger.error("Result for {} contains new resource type {} but no unique id!",
-                            resource, tr.getResourceType());
+                if (tr.getResourceType() != null && tr.getId() == null) {
+                    logger.error(
+                            "Result for {} contains new resource type {} but no unique id!",
+                            resource,
+                            tr.getResourceType());
                     continue;
                 }
-                final RegisteredResourceImpl clone =  (RegisteredResourceImpl)((RegisteredResourceImpl)resource).clone(result[i]);
+                final RegisteredResourceImpl clone =
+                        (RegisteredResourceImpl) ((RegisteredResourceImpl) resource).clone(result[i]);
                 this.checkInstallable(clone);
                 entityIds.add(clone.getEntityId());
             }
             for (EntityResourceList group : this.data.values()) {
                 if (!entityIds.contains(group.getResourceId())) {
                     if (group.removeInternal(resource.getURL())) {
-                        logger.debug("Removed stale resources from group with entityid: {} because after transforming {} the entityids have changed.", group.getResourceId(), resource);
+                        logger.debug(
+                                "Removed stale resources from group with entityid: {} because after transforming {} the entityids have changed.",
+                                group.getResourceId(),
+                                resource);
                     }
                 }
             }
@@ -348,7 +363,7 @@ public class PersistentResourceList {
 
     public void update(final String oldId, final String newAlias, final String newId) {
         final EntityResourceList list = this.data.remove(oldId);
-        if (list != null ) {
+        if (list != null) {
             list.update(newAlias, newId);
             this.data.put(newId, list);
         }

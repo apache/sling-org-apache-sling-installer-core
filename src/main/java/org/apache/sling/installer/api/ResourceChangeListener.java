@@ -24,7 +24,6 @@ import java.util.Map;
 
 import org.osgi.annotation.versioning.ProviderType;
 
-
 /**
  * OSGi Service listening for changes of resources.
  * These resources are not changed through the installer but through
@@ -57,7 +56,8 @@ public interface ResourceChangeListener {
      * @param dict         Dictionary
      * @param attributes   Map of attributes.
      */
-    void resourceAddedOrUpdated(String resourceType,
+    void resourceAddedOrUpdated(
+            String resourceType,
             String entityId,
             InputStream is,
             Dictionary<String, Object> dict,
@@ -68,6 +68,5 @@ public interface ResourceChangeListener {
      * @param resourceType The resource type
      * @param entityId     The entity id (symbolic name etc.)
      */
-    void resourceRemoved(String resourceType,
-            String entityId);
+    void resourceRemoved(String resourceType, String entityId);
 }

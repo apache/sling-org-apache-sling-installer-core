@@ -32,8 +32,7 @@ public class BundleInstallTask extends AbstractBundleTask {
 
     private static final String BUNDLE_INSTALL_ORDER = "40-";
 
-    public BundleInstallTask(final TaskResourceGroup r,
-            final TaskSupport creator) {
+    public BundleInstallTask(final TaskResourceGroup r, final TaskSupport creator) {
         super(r, creator);
     }
 
@@ -44,18 +43,19 @@ public class BundleInstallTask extends AbstractBundleTask {
     public void execute(final InstallationContext ctx) {
         final int startLevel = this.getBundleStartLevel();
         try {
-            final Bundle b = this.getBundleContext().installBundle(getResource().getURL(), getResource().getInputStream());
+            final Bundle b = this.getBundleContext()
+                    .installBundle(getResource().getURL(), getResource().getInputStream());
             ctx.log("Installed bundle {} from resource {}", b, getResource());
             setBundleLocation(getResource(), getResource().getURL());
             // optionally set the start level
-            if ( startLevel > 0 ) {
+            if (startLevel > 0) {
                 final BundleStartLevel startLevelService = b.adapt(BundleStartLevel.class);
                 startLevelService.setStartLevel(startLevel);
                 ctx.log("Set start level for bundle {} to {}", b, startLevel);
             }
 
             // fragment?
-            if ( BundleUtil.isSystemBundleFragment(b) ) {
+            if (BundleUtil.isSystemBundleFragment(b)) {
                 // first install of a system fragment does not need a refresh of the host
                 // so we can just set the state and are done.
                 this.setFinishedState(ResourceState.INSTALLED);
@@ -76,17 +76,23 @@ public class BundleInstallTask extends AbstractBundleTask {
 
                     // mark this resource as to be started
                     BundleUtil.markBundleStart(getResource());
-                    ctx.addTaskToCurrentCycle(new BundleStartTask(getResourceGroup(), b.getBundleId(), this.getTaskSupport()));
+                    ctx.addTaskToCurrentCycle(
+                            new BundleStartTask(getResourceGroup(), b.getBundleId(), this.getTaskSupport()));
                 }
             }
         } catch (final Exception ex) {
             // if something goes wrong we simply try it again
-            this.getLogger().info("Exception during install of bundle " + this.getResource() + " : " + ex.getMessage() + ". Retrying later.", ex);
+            this.getLogger()
+                    .info(
+                            "Exception during install of bundle " + this.getResource() + " : " + ex.getMessage()
+                                    + ". Retrying later.",
+                            ex);
         }
     }
 
     @Override
     public String getSortKey() {
-        return BUNDLE_INSTALL_ORDER + getSortableStartLevel() + "-" + getResource().getURL();
+        return BUNDLE_INSTALL_ORDER + getSortableStartLevel() + "-"
+                + getResource().getURL();
     }
 }

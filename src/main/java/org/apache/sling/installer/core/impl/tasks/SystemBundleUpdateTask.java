@@ -40,8 +40,7 @@ public class SystemBundleUpdateTask extends AbstractInstallTask {
 
     private static final String SYSTEM_BUNDLE_UPDATE_ORDER = BUNDLE_UPDATE_ORDER + "systembundle(0)";
 
-    public SystemBundleUpdateTask(final TaskResourceGroup r,
-            final TaskSupport taskSupport) {
+    public SystemBundleUpdateTask(final TaskResourceGroup r, final TaskSupport taskSupport) {
         super(r, taskSupport);
     }
 
@@ -49,14 +48,14 @@ public class SystemBundleUpdateTask extends AbstractInstallTask {
     public void execute(final InstallationContext ctx) {
         final Bundle systemBundle = this.getBundleContext().getBundle(Constants.SYSTEM_BUNDLE_LOCATION);
         // sanity check
-        if ( systemBundle == null ) {
+        if (systemBundle == null) {
             this.setFinishedState(ResourceState.IGNORED, null, "Cannot update system bundle!");
             ctx.asyncTaskFailed(this);
             return;
         }
 
         // restart system bundle
-        if ( this.getResource() == null ) {
+        if (this.getResource() == null) {
             ctx.log("Refreshing system bundle.");
             this.getBundleRefresher().refreshBundles(ctx, Collections.singletonList(systemBundle), false);
         } else {
@@ -64,7 +63,9 @@ public class SystemBundleUpdateTask extends AbstractInstallTask {
             try {
                 is = getResource().getInputStream();
                 if (is == null) {
-                    String message = MessageFormat.format("RegisteredResource provides null InputStream, cannot update system bundle: {0}", getResource());
+                    String message = MessageFormat.format(
+                            "RegisteredResource provides null InputStream, cannot update system bundle: {0}",
+                            getResource());
                     getLogger().warn(message);
                     this.setFinishedState(ResourceState.IGNORED, null, message);
                     ctx.asyncTaskFailed(this);
@@ -72,22 +73,27 @@ public class SystemBundleUpdateTask extends AbstractInstallTask {
                     try {
                         systemBundle.update(is);
                     } catch (final BundleException e) {
-                        String message = MessageFormat.format("Updating system bundle failed due to {0} - unable to retry: {1}", e.getLocalizedMessage(), this);
+                        String message = MessageFormat.format(
+                                "Updating system bundle failed due to {0} - unable to retry: {1}",
+                                e.getLocalizedMessage(), this);
                         getLogger().warn(message, e);
                         this.setFinishedState(ResourceState.IGNORED, null, message);
                         ctx.asyncTaskFailed(this);
                     }
                 }
             } catch (final IOException e) {
-                String message = MessageFormat.format("Removing failing task due to  due to {0} - unable to retry: {1}", e.getLocalizedMessage(), this);
+                String message = MessageFormat.format(
+                        "Removing failing task due to  due to {0} - unable to retry: {1}",
+                        e.getLocalizedMessage(), this);
                 this.getLogger().warn(message, e);
                 this.setFinishedState(ResourceState.IGNORED, null, message);
                 ctx.asyncTaskFailed(this);
             } finally {
-                if ( is != null ) {
+                if (is != null) {
                     try {
                         is.close();
-                    } catch (final IOException ignore) {}
+                    } catch (final IOException ignore) {
+                    }
                 }
             }
         }
@@ -100,7 +106,7 @@ public class SystemBundleUpdateTask extends AbstractInstallTask {
 
     @Override
     public String getSortKey() {
-        if ( getResource() == null ) {
+        if (getResource() == null) {
             return SYSTEM_BUNDLE_UPDATE_ORDER;
         }
         return BUNDLE_UPDATE_ORDER + getResource().getURL();

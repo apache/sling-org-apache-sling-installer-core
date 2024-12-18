@@ -42,51 +42,49 @@ class RefreshDependenciesUtil {
      */
     boolean isBundleAffected(Bundle target, final List<Bundle> bundles) {
         log.debug("isBundleAffected({}, {})", target, bundles);
-     
+
         final List<Long> idChecked = new ArrayList<Long>();
-        for(Bundle b : bundles) {
-            if(dependsOn(idChecked, target, b)) {
+        for (Bundle b : bundles) {
+            if (dependsOn(idChecked, target, b)) {
                 log.debug("isBundleAffected({}) is true, dependency on bundle {}", target, b);
                 return true;
             }
         }
-        
+
         log.debug("isBundleAffected({}) is false, no dependencies on {}", target, bundles);
         return false;
     }
-    
+
     /** True if target depends on source via package imports */
     private boolean dependsOn(List<Long> idChecked, Bundle target, Bundle source) {
-        
-        if(idChecked.contains(source.getBundleId())) {
+
+        if (idChecked.contains(source.getBundleId())) {
             return false;
         }
         idChecked.add(source.getBundleId());
-        
-        final ExportedPackage [] eps = pckAdmin.getExportedPackages(source);
-        if(eps == null) {
+
+        final ExportedPackage[] eps = pckAdmin.getExportedPackages(source);
+        if (eps == null) {
             return false;
         }
-        
-        for(ExportedPackage ep : eps) {
-            final Bundle [] importers = ep.getImportingBundles();
-            if(importers == null) {
+
+        for (ExportedPackage ep : eps) {
+            final Bundle[] importers = ep.getImportingBundles();
+            if (importers == null) {
                 continue;
             }
-            for(Bundle b : importers) {
-                if(b.getBundleId() == target.getBundleId()) {
-                    log.debug("{} depends on {} via package {}", 
-                            new Object[] { target, source, ep.getName() });
+            for (Bundle b : importers) {
+                if (b.getBundleId() == target.getBundleId()) {
+                    log.debug("{} depends on {} via package {}", new Object[] {target, source, ep.getName()});
                     return true;
                 }
-                if(dependsOn(idChecked, target, b)) {
-                    log.debug("{} depends on {} which depends on {}, returning true",
-                            new Object[] { target, b, source });
+                if (dependsOn(idChecked, target, b)) {
+                    log.debug("{} depends on {} which depends on {}, returning true", new Object[] {target, b, source});
                     return true;
                 }
             }
         }
-        
+
         return false;
     }
 }

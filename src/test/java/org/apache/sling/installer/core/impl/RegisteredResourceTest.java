@@ -18,11 +18,6 @@
  */
 package org.apache.sling.installer.core.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,27 +35,35 @@ import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 public class RegisteredResourceTest {
 
     public static final String TEST_URL = "test:url";
 
     static File getTestBundle(String name) {
-        return new File(System.getProperty("osgi.installer.base.dir"),
+        return new File(
+                System.getProperty("osgi.installer.base.dir"),
                 "org.apache.sling.installer.core-" + System.getProperty("osgi.installer.pom.version") + "-" + name);
     }
 
-    @org.junit.Test public void testResourceType() throws Exception {
+    @org.junit.Test
+    public void testResourceType() throws Exception {
         {
             final InputStream s = new FileInputStream(getTestBundle("testbundle-1.0.jar"));
-            final RegisteredResource r = create(new InstallableResource("test:1.jar", s, null, "some digest", null, null));
+            final RegisteredResource r =
+                    create(new InstallableResource("test:1.jar", s, null, "some digest", null, null));
 
-            assertEquals(".jar URL creates a BUNDLE resource",
-                    InstallableResource.TYPE_BUNDLE, r.getType());
+            assertEquals(".jar URL creates a BUNDLE resource", InstallableResource.TYPE_BUNDLE, r.getType());
             final InputStream rs = r.getInputStream();
             assertNotNull("BUNDLE resource provides an InputStream", rs);
             rs.close();
             assertNull("BUNDLE resource does not provide a Dictionary", r.getDictionary());
-            assertEquals("RegisteredResource entity ID must match", "bundle:osgi-installer-testbundle", r.getEntityId());
+            assertEquals(
+                    "RegisteredResource entity ID must match", "bundle:osgi-installer-testbundle", r.getEntityId());
         }
 
         {
@@ -68,8 +71,10 @@ public class RegisteredResourceTest {
             data.put("foo", "bar");
             data.put("other", 2);
             final TaskResource r = create(new InstallableResource("configuration:1", null, data, null, null, null));
-            assertEquals("No-extension URL with Dictionary creates a CONFIG resource",
-                    InstallableResource.TYPE_CONFIG, r.getType());
+            assertEquals(
+                    "No-extension URL with Dictionary creates a CONFIG resource",
+                    InstallableResource.TYPE_CONFIG,
+                    r.getType());
             final InputStream rs = r.getInputStream();
             assertNull("CONFIG resource does not provide an InputStream", rs);
             final Dictionary<String, Object> d = r.getDictionary();
@@ -79,54 +84,62 @@ public class RegisteredResourceTest {
         }
     }
 
-	@org.junit.Test public void testLocalFileCopy() throws Exception {
-	    final File localFile = File.createTempFile("testLocalFileCopy", ".data");
+    @org.junit.Test
+    public void testLocalFileCopy() throws Exception {
+        final File localFile = File.createTempFile("testLocalFileCopy", ".data");
         localFile.deleteOnExit();
-	    final BundleContext bc = new MockBundleContext();
-	    final File f = getTestBundle("testbundle-1.0.jar");
+        final BundleContext bc = new MockBundleContext();
+        final File f = getTestBundle("testbundle-1.0.jar");
         final InputStream s = new FileInputStream(f);
         FileDataStore.SHARED = new FileDataStore(bc) {
 
             @Override
-            public File createNewDataFile(InputStream stream, String url,
-                    String digest, String hint) throws IOException {
+            public File createNewDataFile(InputStream stream, String url, String digest, String hint)
+                    throws IOException {
                 this.copyToLocalStorage(stream, localFile);
                 return localFile;
             }
-
         };
 
-		InternalResource.create("test", new InstallableResource("test:1.jar", s, null, "somedigest", null, null));
-		assertTrue("Local file exists", localFile.exists());
+        InternalResource.create("test", new InstallableResource("test:1.jar", s, null, "somedigest", null, null));
+        assertTrue("Local file exists", localFile.exists());
 
-		assertEquals("Local file length matches our data", f.length(), localFile.length());
-	}
+        assertEquals("Local file length matches our data", f.length(), localFile.length());
+    }
 
-    @org.junit.Test public void testMissingDigest() throws Exception {
+    @org.junit.Test
+    public void testMissingDigest() throws Exception {
         final String data = "This is some data";
         final InputStream in = new ByteArrayInputStream(data.getBytes());
 
         create(new InstallableResource("test:1.jar", in, null, null, null, null));
-        assertNotNull(create(new InstallableResource("test:1.jar", in, null, null, null, null)).getDigest());
+        assertNotNull(create(new InstallableResource("test:1.jar", in, null, null, null, null))
+                .getDigest());
     }
 
-    @org.junit.Test public void testBundleManifest() throws Exception {
+    @org.junit.Test
+    public void testBundleManifest() throws Exception {
         final File f = getTestBundle("testbundle-1.0.jar");
-        final InstallableResource i = new InstallableResource("test:" + f.getAbsolutePath(), new FileInputStream(f), null, f.getName(), null, null);
+        final InstallableResource i = new InstallableResource(
+                "test:" + f.getAbsolutePath(), new FileInputStream(f), null, f.getName(), null, null);
         final TaskResource r = create(i);
-        assertNotNull("RegisteredResource must have bundle symbolic name", r.getAttribute(Constants.BUNDLE_SYMBOLICNAME));
+        assertNotNull(
+                "RegisteredResource must have bundle symbolic name", r.getAttribute(Constants.BUNDLE_SYMBOLICNAME));
         assertEquals("RegisteredResource entity ID must match", "bundle:osgi-installer-testbundle", r.getEntityId());
     }
 
-//    @org.junit.Test
+    //    @org.junit.Test
     public void testConfigEntity() throws Exception {
-        final InstallableResource i = new InstallableResource("test:/foo/someconfig", null, new Hashtable<String, Object>(), null, null, null);
+        final InstallableResource i = new InstallableResource(
+                "test:/foo/someconfig", null, new Hashtable<String, Object>(), null, null, null);
         final TaskResource r = create(i);
-        assertNull("RegisteredResource must not have bundle symbolic name", r.getAttribute(Constants.BUNDLE_SYMBOLICNAME));
+        assertNull(
+                "RegisteredResource must not have bundle symbolic name", r.getAttribute(Constants.BUNDLE_SYMBOLICNAME));
         assertEquals("RegisteredResource entity ID must match", "config:someconfig", r.getEntityId());
     }
 
-    @org.junit.Test public void testConfigDigestIncludesUrl() throws Exception {
+    @org.junit.Test
+    public void testConfigDigestIncludesUrl() throws Exception {
         final Dictionary<String, Object> data = new Hashtable<String, Object>();
         final InstallableResource rA = new InstallableResource("test:urlA", null, data, null, null, null);
         final InstallableResource rB = new InstallableResource("test:urlB", null, data, null, null, null);
@@ -139,18 +152,21 @@ public class RegisteredResourceTest {
     public void testDictionaryDigest() throws IOException {
         final Dictionary<String, Object> d = new Hashtable<String, Object>();
         final InstallableResource r = new InstallableResource("x:url", null, d, null, null, null);
-        assertNotNull("Expected RegisteredResource to compute its own digest", create(r).getDigest());
+        assertNotNull(
+                "Expected RegisteredResource to compute its own digest",
+                create(r).getDigest());
     }
 
-    @org.junit.Test public void testDictionaryDigestFromDictionaries() throws Exception {
+    @org.junit.Test
+    public void testDictionaryDigestFromDictionaries() throws Exception {
         final Hashtable<String, Object> d1 = new Hashtable<String, Object>();
         final Hashtable<String, Object> d2 = new Hashtable<String, Object>();
 
-        final String [] keys = { "foo", "bar", "something" };
-        for(int i=0 ; i < keys.length; i++) {
+        final String[] keys = {"foo", "bar", "something"};
+        for (int i = 0; i < keys.length; i++) {
             d1.put(keys[i], keys[i] + "." + keys[i]);
         }
-        for(int i=keys.length - 1 ; i >= 0; i--) {
+        for (int i = keys.length - 1; i >= 0; i--) {
             d2.put(keys[i], keys[i] + "." + keys[i]);
         }
 
@@ -160,8 +176,7 @@ public class RegisteredResourceTest {
         assertEquals(
                 "Two InstallableResource (Dictionary) with same values but different key orderings must have the same key",
                 create(r1).getDigest(),
-                create(r2).getDigest()
-        );
+                create(r2).getDigest());
     }
 
     private TaskResource create(final InstallableResource is) throws IOException {
@@ -169,13 +184,13 @@ public class RegisteredResourceTest {
         final InternalResource internal = InternalResource.create("test", is);
         final RegisteredResourceImpl rr = RegisteredResourceImpl.create(internal);
         final TransformationResult[] tr = new DefaultTransformer().transform(rr);
-        if ( tr != null ) {
+        if (tr != null) {
             return rr.clone(tr[0]);
-        } else if ( is.getId().startsWith("configuration:") ) {
+        } else if (is.getId().startsWith("configuration:")) {
             final TransformationResult result = new TransformationResult();
             result.setId(is.getId().substring(14));
             result.setResourceType(InstallableResource.TYPE_CONFIG);
-            result.setAttributes(Collections.singletonMap(Constants.SERVICE_PID, (Object)result.getId()));
+            result.setAttributes(Collections.singletonMap(Constants.SERVICE_PID, (Object) result.getId()));
             return rr.clone(result);
         }
         return rr;

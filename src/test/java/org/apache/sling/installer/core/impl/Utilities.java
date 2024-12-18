@@ -23,17 +23,16 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 
 class Utilities {
-    
+
     static File getTestFile() throws IOException {
         final File result = File.createTempFile(Utilities.class.getName(), null);
         result.deleteOnExit();
         return result;
     }
-    
+
     static void setField(Object o, String name, Object value) throws Exception {
         final Field f = o.getClass().getDeclaredField(name);
         f.setAccessible(true);
         f.set(o, value);
     }
-
 }

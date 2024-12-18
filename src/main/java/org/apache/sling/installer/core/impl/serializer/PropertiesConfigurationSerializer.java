@@ -31,13 +31,14 @@ import org.osgi.util.converter.Converters;
 public class PropertiesConfigurationSerializer implements ConfigurationSerializer {
 
     private final boolean isXml;
-    
+
     public PropertiesConfigurationSerializer(boolean isXml) {
         this.isXml = isXml;
     }
 
     @Override
-    public void serialize(@NotNull Dictionary<String, Object> dictionary, @NotNull OutputStream outputStream) throws IOException {
+    public void serialize(@NotNull Dictionary<String, Object> dictionary, @NotNull OutputStream outputStream)
+            throws IOException {
         // convert to properties object
         Converter converter = Converters.standardConverter();
         Properties properties = converter.convert(dictionary).to(Properties.class);
@@ -47,5 +48,4 @@ public class PropertiesConfigurationSerializer implements ConfigurationSerialize
             properties.storeToXML(outputStream, null);
         }
     }
-
 }

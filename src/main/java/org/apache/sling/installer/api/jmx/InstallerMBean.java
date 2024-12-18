@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.sling.installer.api.jmx;
 
 import org.osgi.annotation.versioning.ProviderType;

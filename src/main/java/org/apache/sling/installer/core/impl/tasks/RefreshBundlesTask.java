@@ -29,36 +29,33 @@ import org.osgi.framework.Bundle;
 /**
  * Refresh a set of bundles.
  */
-public class RefreshBundlesTask
-    extends AbstractBundleTask {
+public class RefreshBundlesTask extends AbstractBundleTask {
 
     private static final String REFRESH_PACKAGES_ORDER = "60-";
 
     /** Global set of bundles to refresh. */
     private static final Set<Long> BUNDLE_IDS = new HashSet<Long>();
 
-    public static void markBundleForRefresh(final InstallationContext ctx,
-                    final TaskSupport btc,
-                    final Bundle bundle) {
-        synchronized ( BUNDLE_IDS ) {
+    public static void markBundleForRefresh(final InstallationContext ctx, final TaskSupport btc, final Bundle bundle) {
+        synchronized (BUNDLE_IDS) {
             BUNDLE_IDS.add(bundle.getBundleId());
             ctx.addTaskToCurrentCycle(new RefreshBundlesTask(btc));
         }
     }
 
     public RefreshBundlesTask(final TaskSupport btc) {
-	    super(null, btc);
-	}
+        super(null, btc);
+    }
 
-	@Override
-	public String getSortKey() {
-		return REFRESH_PACKAGES_ORDER;
-	}
+    @Override
+    public String getSortKey() {
+        return REFRESH_PACKAGES_ORDER;
+    }
 
-	@Override
-	public String toString() {
-		return getClass().getSimpleName();
-	}
+    @Override
+    public String toString() {
+        return getClass().getSimpleName();
+    }
 
     /**
      * @see org.apache.sling.installer.api.tasks.InstallTask#execute(org.apache.sling.installer.api.tasks.InstallationContext)
@@ -67,10 +64,10 @@ public class RefreshBundlesTask
     public void execute(final InstallationContext ctx) {
         boolean doFullRefresh = false;
         final List<Bundle> bundles = new ArrayList<Bundle>();
-        synchronized ( BUNDLE_IDS ) {
-            for(final Long id : BUNDLE_IDS) {
+        synchronized (BUNDLE_IDS) {
+            for (final Long id : BUNDLE_IDS) {
                 final Bundle b = this.getBundleContext().getBundle(id);
-                if ( b != null ) {
+                if (b != null) {
                     getLogger().debug("Will refresh bundle {}", b);
                     bundles.add(b);
                 } else {
@@ -80,16 +77,17 @@ public class RefreshBundlesTask
             }
             BUNDLE_IDS.clear();
         }
-        if ( doFullRefresh || bundles.size() > 0 ) {
+        if (doFullRefresh || bundles.size() > 0) {
             // check if the installer bundle is affected
-            if ( !this.getBundleRefresher().isInstallerBundleAffected(bundles) ) {
+            if (!this.getBundleRefresher().isInstallerBundleAffected(bundles)) {
                 this.getBundleRefresher().refreshBundles(ctx, (doFullRefresh ? null : bundles), true);
             } else {
                 ctx.log("Installer bundle is affected by bundle refresh, initiating asynchronous refresh");
-                ctx.addTaskToCurrentCycle(new AsyncRefreshBundlesTask(this.getTaskSupport(), (doFullRefresh ? null : bundles)));
+                ctx.addTaskToCurrentCycle(
+                        new AsyncRefreshBundlesTask(this.getTaskSupport(), (doFullRefresh ? null : bundles)));
             }
         }
-	}
+    }
 
     private final class AsyncRefreshBundlesTask extends AbstractBundleTask {
 

@@ -33,8 +33,7 @@ public class BundleRemoveTask extends AbstractBundleTask {
 
     private static final String BUNDLE_REMOVE_ORDER = "30-";
 
-    public BundleRemoveTask(final TaskResourceGroup r,
-                            final TaskSupport creator) {
+    public BundleRemoveTask(final TaskResourceGroup r, final TaskSupport creator) {
         super(r, creator);
     }
 
@@ -42,8 +41,8 @@ public class BundleRemoveTask extends AbstractBundleTask {
      * @see org.apache.sling.installer.api.tasks.InstallTask#execute(org.apache.sling.installer.api.tasks.InstallationContext)
      */
     public void execute(InstallationContext ctx) {
-        final String symbolicName = (String)getResource().getAttribute(Constants.BUNDLE_SYMBOLICNAME);
-        final String version = (String)getResource().getAttribute(Constants.BUNDLE_VERSION);
+        final String symbolicName = (String) getResource().getAttribute(Constants.BUNDLE_SYMBOLICNAME);
+        final String version = (String) getResource().getAttribute(Constants.BUNDLE_VERSION);
         final Bundle b = BundleInfo.getMatchingBundle(this.getBundleContext(), symbolicName, version);
         if (b == null) {
             // nothing to do, so just stop
@@ -53,17 +52,21 @@ public class BundleRemoveTask extends AbstractBundleTask {
         final int state = b.getState();
         try {
             if (state == Bundle.ACTIVE || state == Bundle.STARTING) {
-            	b.stop();
+                b.stop();
             }
             b.uninstall();
             ctx.log("Uninstalled bundle {} from resource {}", b, getResource());
             // if the bundle exported packages, we need to refresh
-            if ( BundleUtil.getFragmentHostHeader(b) == null ) {
+            if (BundleUtil.getFragmentHostHeader(b) == null) {
                 RefreshBundlesTask.markBundleForRefresh(ctx, this.getTaskSupport(), b);
             }
             this.setFinishedState(ResourceState.UNINSTALLED);
         } catch (final BundleException be) {
-            this.getLogger().info("Exception during removal of bundle " + this.getResource() + " : " + be.getMessage() + ". Retrying later.", be);
+            this.getLogger()
+                    .info(
+                            "Exception during removal of bundle " + this.getResource() + " : " + be.getMessage()
+                                    + ". Retrying later.",
+                            be);
         }
     }
 
@@ -71,5 +74,4 @@ public class BundleRemoveTask extends AbstractBundleTask {
     public String getSortKey() {
         return BUNDLE_REMOVE_ORDER + getResource().getURL();
     }
-
 }

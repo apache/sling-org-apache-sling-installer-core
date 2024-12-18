@@ -55,34 +55,33 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface OsgiInstaller {
 
-	/**
-	 * Provide the installer with the complete list of installable
-	 * resources for a given client.
-	 *
-	 * Client must call this at startup and/or when the installer
-	 * service becomes available. The installer stores the list of
-	 * previously registered/added resources, compares with the new
-	 * list and removes resources that have disappeared.
-	 *
+    /**
+     * Provide the installer with the complete list of installable
+     * resources for a given client.
+     *
+     * Client must call this at startup and/or when the installer
+     * service becomes available. The installer stores the list of
+     * previously registered/added resources, compares with the new
+     * list and removes resources that have disappeared.
+     *
      * Invalid resources are ignored.
-	 *
+     *
      * @param urlScheme identifies the client.
-	 * @param resources the list of available resources
-	 */
-	void registerResources(String urlScheme, InstallableResource[] resources);
+     * @param resources the list of available resources
+     */
+    void registerResources(String urlScheme, InstallableResource[] resources);
 
     /**
-	 * Inform the installer that resources are available for installation
-	 * and/or other resources are no longer available.
-	 * This method is called if
-	 * - installed resources have been modified
-	 * - new resources are available
-	 * - installed resources should be uninstalled
-	 * Invalid resources are ignored.
+     * Inform the installer that resources are available for installation
+     * and/or other resources are no longer available.
+     * This method is called if
+     * - installed resources have been modified
+     * - new resources are available
+     * - installed resources should be uninstalled
+     * Invalid resources are ignored.
      * @param urlScheme identifies the client.
      * @param resources An array of updated/new resources - might be null
      * @param idsToRemove An array of identifiers for removed resources - might be null
-	 */
-	void updateResources(String urlScheme, InstallableResource[] resources,
-	        String[] idsToRemove);
+     */
+    void updateResources(String urlScheme, InstallableResource[] resources, String[] idsToRemove);
 }

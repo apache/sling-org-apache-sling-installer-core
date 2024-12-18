@@ -69,16 +69,14 @@ public class MockBundleContext implements BundleContext {
 
     @Override
     @SuppressWarnings("rawtypes")
-    public ServiceRegistration registerService(String clazz, Object service,
-            Dictionary properties) {
+    public ServiceRegistration registerService(String clazz, Object service, Dictionary properties) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     @SuppressWarnings("rawtypes")
-    public ServiceRegistration registerService(String[] clazzes,
-            Object service, Dictionary properties) {
+    public ServiceRegistration registerService(String[] clazzes, Object service, Dictionary properties) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -90,15 +88,13 @@ public class MockBundleContext implements BundleContext {
     }
 
     @Override
-    public Bundle installBundle(String location, InputStream input)
-            throws BundleException {
+    public Bundle installBundle(String location, InputStream input) throws BundleException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public ServiceReference[] getServiceReferences(String clazz, String filter)
-            throws InvalidSyntaxException {
+    public ServiceReference[] getServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -123,7 +119,7 @@ public class MockBundleContext implements BundleContext {
     @Override
     public File getDataFile(String filename) {
         try {
-            if ( "installer".equals(filename) ) {
+            if ("installer".equals(filename)) {
                 final File dir = this.getDataFile("test").getParentFile();
                 dir.deleteOnExit();
                 return new File(dir, filename);
@@ -290,8 +286,7 @@ public class MockBundleContext implements BundleContext {
 
             @Override
             @SuppressWarnings("rawtypes")
-            public Enumeration findEntries(String path, String filePattern,
-                    boolean recurse) {
+            public Enumeration findEntries(String path, String filePattern, boolean recurse) {
                 // TODO Auto-generated method stub
                 return null;
             }
@@ -348,8 +343,7 @@ public class MockBundleContext implements BundleContext {
     }
 
     @Override
-    public Collection getServiceReferences(Class clazz, String filter)
-            throws InvalidSyntaxException {
+    public Collection getServiceReferences(Class clazz, String filter) throws InvalidSyntaxException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -361,8 +355,7 @@ public class MockBundleContext implements BundleContext {
     }
 
     @Override
-    public ServiceReference[] getAllServiceReferences(String clazz,
-            String filter) throws InvalidSyntaxException {
+    public ServiceReference[] getAllServiceReferences(String clazz, String filter) throws InvalidSyntaxException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -380,8 +373,7 @@ public class MockBundleContext implements BundleContext {
     }
 
     @Override
-    public void addServiceListener(ServiceListener listener, String filter)
-            throws InvalidSyntaxException {
+    public void addServiceListener(ServiceListener listener, String filter) throws InvalidSyntaxException {
         // TODO Auto-generated method stub
 
     }
@@ -399,8 +391,8 @@ public class MockBundleContext implements BundleContext {
     }
 
     @Override
-    public <S> ServiceRegistration<S> registerService(Class<S> clazz, ServiceFactory<S> factory,
-            Dictionary<String, ?> properties) {
+    public <S> ServiceRegistration<S> registerService(
+            Class<S> clazz, ServiceFactory<S> factory, Dictionary<String, ?> properties) {
         // TODO Auto-generated method stub
         return null;
     }

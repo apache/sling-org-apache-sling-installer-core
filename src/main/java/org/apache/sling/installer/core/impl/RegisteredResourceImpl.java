@@ -43,8 +43,7 @@ import org.osgi.framework.Version;
 /**
  * Implementation of the registered resource
  */
-public class RegisteredResourceImpl
-    implements TaskResource, Serializable, Comparable<RegisteredResourceImpl> {
+public class RegisteredResourceImpl implements TaskResource, Serializable, Comparable<RegisteredResourceImpl> {
 
     /** Use own serial version ID as we control serialization. */
     private static final long serialVersionUID = 6L;
@@ -56,25 +55,25 @@ public class RegisteredResourceImpl
     private String url;
 
     /** The installer scheme. */
-	private String urlScheme;
+    private String urlScheme;
 
-	/** The digest for the resource. */
-	private String digest;
+    /** The digest for the resource. */
+    private String digest;
 
-	/** The entity id. */
-	private String entity;
+    /** The entity id. */
+    private String entity;
 
-	/** The dictionary for configurations. */
-	private final Dictionary<String, Object> dictionary;
+    /** The dictionary for configurations. */
+    private final Dictionary<String, Object> dictionary;
 
-	/** Additional attributes. */
-	private final Map<String, Object> attributes = new HashMap<>();
+    /** Additional attributes. */
+    private final Map<String, Object> attributes = new HashMap<>();
 
-	private String dataUri;
+    private String dataUri;
 
-	private File dataFile;
+    private File dataFile;
 
-	private int priority;
+    private int priority;
 
     private String resourceType;
 
@@ -99,8 +98,7 @@ public class RegisteredResourceImpl
      * @param out Object output stream
      * @throws IOException
      */
-    private void writeObject(final java.io.ObjectOutputStream out)
-    throws IOException {
+    private void writeObject(final java.io.ObjectOutputStream out) throws IOException {
         out.writeInt(VERSION);
         out.writeObject(url);
         out.writeObject(urlScheme);
@@ -122,10 +120,9 @@ public class RegisteredResourceImpl
      * - read version id
      * - deserialize each entry in the resources list
      */
-    private void readObject(final java.io.ObjectInputStream in)
-    throws IOException, ClassNotFoundException {
+    private void readObject(final java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         final int version = in.readInt();
-        if ( version < 1 || version > VERSION ) {
+        if (version < 1 || version > VERSION) {
             throw new ClassNotFoundException(this.getClass().getName());
         }
         Util.setField(this, "url", in.readObject());
@@ -138,27 +135,27 @@ public class RegisteredResourceImpl
         Util.setField(this, "resourceType", in.readObject());
         Util.setField(this, "priority", in.readInt());
         this.state = ResourceState.valueOf((String) in.readObject());
-        if ( version > 1 ) {
+        if (version > 1) {
             this.lastChange = in.readLong();
         } else {
             this.lastChange = 0;
         }
-        if ( version > 2 ) {
-            this.dataUri = (String)in.readObject();
-        } else if ( InstallableResource.TYPE_CONFIG.equals(this.resourceType) && this.dictionary != null ) {
+        if (version > 2) {
+            this.dataUri = (String) in.readObject();
+        } else if (InstallableResource.TYPE_CONFIG.equals(this.resourceType) && this.dictionary != null) {
             // update digest calculated by older versions
             final String updatedDigest = FileDataStore.computeDigest(this.dictionary);
-            if ( !updatedDigest.equals(this.digest) ) {
+            if (!updatedDigest.equals(this.digest)) {
                 this.digest = updatedDigest;
             }
         }
         if (version > 3) {
-            error = (String)in.readObject();
+            error = (String) in.readObject();
         } else {
             error = "";
         }
         // update file location
-        if ( this.dataFile != null ) {
+        if (this.dataFile != null) {
             this.dataFile = FileDataStore.SHARED.getDataFile(this.dataFile.getName());
         }
     }
@@ -166,11 +163,10 @@ public class RegisteredResourceImpl
     /**
      * Try to create a registered resource.
      */
-    public static RegisteredResourceImpl create(
-            final InternalResource input)
-    throws IOException {
+    public static RegisteredResourceImpl create(final InternalResource input) throws IOException {
         final int schemePos = input.getURL().indexOf(':');
-        return new RegisteredResourceImpl(input.getId(),
+        return new RegisteredResourceImpl(
+                input.getId(),
                 input.getResourceUri(),
                 input.getPrivateCopyOfFile(),
                 input.getPrivateCopyOfDictionary(),
@@ -180,20 +176,21 @@ public class RegisteredResourceImpl
                 input.getURL().substring(0, schemePos));
     }
 
-	/**
-	 * Create a RegisteredResource from given data.
-	 * As this data object is filled from an {@link #create(BundleContext, InstallableResource, String)}
-	 * we don't have to validate values - this has already been done
-	 * The only exception is the digest!
-	 */
-	private RegisteredResourceImpl(final String id,
-	        final String resourceUri,
-	        final File file,
-	        final Dictionary<String, Object> dict,
-	        final String type,
-	        final String digest,
-	        final int priority,
-	        final String scheme) {
+    /**
+     * Create a RegisteredResource from given data.
+     * As this data object is filled from an {@link #create(BundleContext, InstallableResource, String)}
+     * we don't have to validate values - this has already been done
+     * The only exception is the digest!
+     */
+    private RegisteredResourceImpl(
+            final String id,
+            final String resourceUri,
+            final File file,
+            final Dictionary<String, Object> dict,
+            final String type,
+            final String digest,
+            final int priority,
+            final String scheme) {
         this.url = scheme + ':' + id;
         this.dataUri = resourceUri;
         this.dataFile = file;
@@ -202,29 +199,29 @@ public class RegisteredResourceImpl
         this.digest = digest;
         this.priority = priority;
         this.urlScheme = scheme;
-	}
+    }
 
-	@Override
-	public String toString() {
-	    final StringBuilder sb = new StringBuilder();
-	    if ( this.getEntityId() == null ) {
-	        sb.append("RegisteredResource");
-	    } else {
-	        sb.append("TaskResource");
-	    }
-	    sb.append("(url=");
-	    sb.append(this.getURL());
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        if (this.getEntityId() == null) {
+            sb.append("RegisteredResource");
+        } else {
+            sb.append("TaskResource");
+        }
+        sb.append("(url=");
+        sb.append(this.getURL());
 
-	    if ( this.getEntityId() != null ) {
-	        sb.append(", entity=");
-	        sb.append(this.getEntityId());
-	        sb.append(", state=");
-	        sb.append(this.state);
-            if ( this.attributes.size() > 0 ) {
+        if (this.getEntityId() != null) {
+            sb.append(", entity=");
+            sb.append(this.getEntityId());
+            sb.append(", state=");
+            sb.append(this.state);
+            if (this.attributes.size() > 0) {
                 sb.append(", attributes=[");
                 boolean first = true;
-                for(final Map.Entry<String, Object> entry : this.attributes.entrySet()) {
-                    if ( !first ) {
+                for (final Map.Entry<String, Object> entry : this.attributes.entrySet()) {
+                    if (!first) {
                         sb.append(", ");
                     }
                     first = false;
@@ -234,88 +231,88 @@ public class RegisteredResourceImpl
                 }
                 sb.append("]");
             }
-	    }
-	    sb.append(", digest=");
-	    sb.append(this.getDigest());
-	    sb.append(')');
-	    return sb.toString();
-	}
+        }
+        sb.append(", digest=");
+        sb.append(this.getDigest());
+        sb.append(')');
+        return sb.toString();
+    }
 
-	public boolean hasDataFile() {
-	    return this.dataFile != null;
-	}
+    public boolean hasDataFile() {
+        return this.dataFile != null;
+    }
 
-	public File getDataFile() {
-	    return this.dataFile;
-	}
+    public File getDataFile() {
+        return this.dataFile;
+    }
 
     public String getDataURI() {
         return this.dataUri;
     }
 
     /**
-	 * Remove the data file
-	 */
-	private void removeDataFile() {
-        if ( this.dataFile != null && this.dataFile.exists() ) {
+     * Remove the data file
+     */
+    private void removeDataFile() {
+        if (this.dataFile != null && this.dataFile.exists()) {
             this.dataFile.delete();
         }
         this.dataUri = null;
-	}
+    }
 
-	/**
-	 * Clean up used data files.
-	 */
-	public void cleanup() {
-	    if ( !cleanedUp ) {
-	        cleanedUp = true;
-	        this.removeDataFile();
-	        FileDataStore.SHARED.removeFromDigestCache(this.url, this.digest);
-	    }
-	}
+    /**
+     * Clean up used data files.
+     */
+    public void cleanup() {
+        if (!cleanedUp) {
+            cleanedUp = true;
+            this.removeDataFile();
+            FileDataStore.SHARED.removeFromDigestCache(this.url, this.digest);
+        }
+    }
 
-	/**
-	 * @see org.apache.sling.installer.api.tasks.RegisteredResource#getURL()
-	 */
-	@Override
+    /**
+     * @see org.apache.sling.installer.api.tasks.RegisteredResource#getURL()
+     */
+    @Override
     public String getURL() {
-		return this.url;
-	}
+        return this.url;
+    }
 
-	/**
-	 * @see org.apache.sling.installer.api.tasks.RegisteredResource#getInputStream()
-	 */
-	@Override
+    /**
+     * @see org.apache.sling.installer.api.tasks.RegisteredResource#getInputStream()
+     */
+    @Override
     public InputStream getInputStream() throws IOException {
-	    if ( this.dataUri != null ) {
-	        try {
-    	        final URI uri = new URI(this.dataUri);
-    	        return uri.toURL().openStream();
-	        } catch (final URISyntaxException use) {
-	            throw (IOException)new IOException().initCause(use);
-	        }
-	    }
-	    if (this.dataFile != null && this.dataFile.exists() ) {
-	        return new BufferedInputStream(new FileInputStream(this.dataFile));
-	    }
+        if (this.dataUri != null) {
+            try {
+                final URI uri = new URI(this.dataUri);
+                return uri.toURL().openStream();
+            } catch (final URISyntaxException use) {
+                throw (IOException) new IOException().initCause(use);
+            }
+        }
+        if (this.dataFile != null && this.dataFile.exists()) {
+            return new BufferedInputStream(new FileInputStream(this.dataFile));
+        }
         return null;
-	}
+    }
 
-	/**
-	 * @see org.apache.sling.installer.api.tasks.RegisteredResource#getDictionary()
-	 */
-	@Override
+    /**
+     * @see org.apache.sling.installer.api.tasks.RegisteredResource#getDictionary()
+     */
+    @Override
     public Dictionary<String, Object> getDictionary() {
-		return dictionary;
-	}
+        return dictionary;
+    }
 
-	/**
-	 * @see org.apache.sling.installer.api.tasks.RegisteredResource#getDigest()
-	 */
-	@Override
+    /**
+     * @see org.apache.sling.installer.api.tasks.RegisteredResource#getDigest()
+     */
+    @Override
     public String getDigest() {
-		return digest;
-	}
+        return digest;
+    }
 
     /**
      * @see org.apache.sling.installer.api.tasks.RegisteredResource#getType()
@@ -346,7 +343,7 @@ public class RegisteredResourceImpl
      */
     @Override
     public void setAttribute(final String key, final Object value) {
-        if ( value == null ) {
+        if (value == null) {
             this.attributes.remove(key);
         } else {
             this.attributes.put(key, value);
@@ -399,16 +396,16 @@ public class RegisteredResourceImpl
      */
     @Override
     public boolean equals(Object obj) {
-        if ( obj == this ) {
+        if (obj == this) {
             return true;
         }
-        if ( ! (obj instanceof RegisteredResourceImpl) ) {
+        if (!(obj instanceof RegisteredResourceImpl)) {
             return false;
         }
-        if ( this.entity == null ) {
-            return this.getURL().equals(((RegisteredResourceImpl)obj).getURL());
+        if (this.entity == null) {
+            return this.getURL().equals(((RegisteredResourceImpl) obj).getURL());
         }
-        return compareTo((RegisteredResourceImpl)obj) == 0;
+        return compareTo((RegisteredResourceImpl) obj) == 0;
     }
 
     /**
@@ -435,13 +432,13 @@ public class RegisteredResourceImpl
         // check if the artifacts have a version
         final Version va = a.getVersion();
         final Version vb = b.getVersion();
-        if ( va != null && vb != null ) {
+        if (va != null && vb != null) {
             // Compare version
-            if ( !vb.equals(va) ) {
+            if (!vb.equals(va)) {
                 return false;
             }
             final boolean isSnapshot = va.toString().contains("SNAPSHOT");
-            if ( !isSnapshot ) {
+            if (!isSnapshot) {
                 return true;
             }
         }
@@ -461,12 +458,12 @@ public class RegisteredResourceImpl
         // check entity id first
         final String aId = a.getEntityId();
         final String bId = b.getEntityId();
-        if(aId != null && bId != null) {
+        if (aId != null && bId != null) {
             result = aId.compareTo(bId);
         }
 
         boolean hasVersion = false;
-        if ( result == 0 ) {
+        if (result == 0) {
             // compare versions
             boolean isSnapshot = false;
 
@@ -474,7 +471,7 @@ public class RegisteredResourceImpl
             final Version va = a.getVersion();
             final Version vb = b.getVersion();
 
-            if ( va != null && vb != null ) {
+            if (va != null && vb != null) {
                 hasVersion = true;
                 isSnapshot = va.toString().contains("SNAPSHOT");
                 // higher version has more priority, must come first so invert comparison
@@ -492,21 +489,21 @@ public class RegisteredResourceImpl
             }
         }
 
-        if ( result == 0 && a.getState() != b.getState() ) {
-            if ( a.getState() == ResourceState.INSTALLED ) {
+        if (result == 0 && a.getState() != b.getState()) {
+            if (a.getState() == ResourceState.INSTALLED) {
                 return -1;
-            } else if ( b.getState() == ResourceState.INSTALLED ) {
+            } else if (b.getState() == ResourceState.INSTALLED) {
                 return 1;
-            } else if ( a.getState() == ResourceState.INSTALL ) {
+            } else if (a.getState() == ResourceState.INSTALL) {
                 return -1;
-            } else if ( b.getState() == ResourceState.INSTALL ) {
+            } else if (b.getState() == ResourceState.INSTALL) {
                 return 1;
             }
         }
-        if ( result == 0 ) {
+        if (result == 0) {
             // finally use url and then digest
             result = a.getURL().compareTo(b.getURL());
-            if ( result == 0 && !hasVersion ) {
+            if (result == 0 && !hasVersion) {
                 // higher digest has more priority, must come first so invert comparison
                 result = b.getDigest().compareTo(a.getDigest());
             }
@@ -519,7 +516,7 @@ public class RegisteredResourceImpl
      */
     @Override
     public Object getTemporaryAttribute(final String key) {
-        if ( this.temporaryAttributes != null ) {
+        if (this.temporaryAttributes != null) {
             return this.temporaryAttributes.get(key);
         }
         return null;
@@ -530,10 +527,10 @@ public class RegisteredResourceImpl
      */
     @Override
     public void setTemporaryAttribute(final String key, final Object value) {
-        if ( this.temporaryAttributes == null ) {
+        if (this.temporaryAttributes == null) {
             this.temporaryAttributes = new HashMap<>();
         }
-        if ( value == null ) {
+        if (value == null) {
             this.temporaryAttributes.remove(key);
         } else {
             this.temporaryAttributes.put(key, value);
@@ -545,27 +542,26 @@ public class RegisteredResourceImpl
      * Currently only the input stream and resource type is updated.
      * @param tr Transformation result
      */
-    private void update(final TransformationResult tr)
-    throws IOException {
+    private void update(final TransformationResult tr) throws IOException {
         final InputStream is = tr.getInputStream();
-        if ( tr.getResourceType() != null ) {
+        if (tr.getResourceType() != null) {
             this.resourceType = tr.getResourceType();
-            if ( tr.getId() != null ) {
+            if (tr.getId() != null) {
                 this.entity = this.resourceType + ':' + tr.getId();
             } else {
-                if ( !InstallableResource.TYPE_FILE.equals(this.getType())
-                      && !InstallableResource.TYPE_PROPERTIES.equals(this.getType()) ) {
+                if (!InstallableResource.TYPE_FILE.equals(this.getType())
+                        && !InstallableResource.TYPE_PROPERTIES.equals(this.getType())) {
 
                     String lastIdPart = this.getURL();
                     final int slashPos = lastIdPart.lastIndexOf('/');
-                    if ( slashPos != -1 ) {
+                    if (slashPos != -1) {
                         lastIdPart = lastIdPart.substring(slashPos + 1);
                     }
                     this.entity = this.resourceType + ':' + lastIdPart;
                 }
             }
         }
-        if ( is != null ) {
+        if (is != null) {
             try {
                 final File newDataFile = FileDataStore.SHARED.createNewDataFile(this.getType(), is);
                 this.removeDataFile();
@@ -573,13 +569,14 @@ public class RegisteredResourceImpl
             } finally {
                 try {
                     is.close();
-                } catch (final IOException ignore) {}
+                } catch (final IOException ignore) {
+                }
             }
         }
-        if ( tr.getAttributes() != null ) {
+        if (tr.getAttributes() != null) {
             this.attributes.putAll(tr.getAttributes());
         }
-        if ( tr.getVersion() != null ) {
+        if (tr.getVersion() != null) {
             this.attributes.put(Constants.BUNDLE_VERSION, tr.getVersion().toString());
         }
     }
@@ -588,17 +585,20 @@ public class RegisteredResourceImpl
      * Update the resource uri - if provided.
      */
     public void update(final InternalResource rsrc) {
-        if ( rsrc.getResourceUri() != null ) {
+        if (rsrc.getResourceUri() != null) {
             FileDataStore.SHARED.removeFromDigestCache(this.url, this.digest);
             this.removeDataFile();
             this.dataUri = rsrc.getResourceUri();
-            if ( this.dictionary != null ) {
+            if (this.dictionary != null) {
                 this.dictionary.put(InstallableResource.RESOURCE_URI_HINT, rsrc.getResourceUri());
             }
-        } else if ( rsrc.getPrivateCopyOfFile() != null ) {
-            final boolean update = this.dataFile == null || !this.dataFile.getName().equals(rsrc.getPrivateCopyOfFile().getName());
-            if ( update ) {
-                if ( this.dictionary != null ) {
+        } else if (rsrc.getPrivateCopyOfFile() != null) {
+            final boolean update = this.dataFile == null
+                    || !this.dataFile
+                            .getName()
+                            .equals(rsrc.getPrivateCopyOfFile().getName());
+            if (update) {
+                if (this.dictionary != null) {
                     this.dictionary.remove(InstallableResource.RESOURCE_URI_HINT);
                 }
                 this.removeDataFile();
@@ -612,11 +612,11 @@ public class RegisteredResourceImpl
      * Update the resource uri - if provided.
      */
     public void updateResourceUri(final String updatedResourceUri) {
-        if ( updatedResourceUri != null ) {
+        if (updatedResourceUri != null) {
             FileDataStore.SHARED.removeFromDigestCache(this.url, this.digest);
             this.removeDataFile();
             this.dataUri = updatedResourceUri;
-            if ( this.dictionary != null ) {
+            if (this.dictionary != null) {
                 this.dictionary.put(InstallableResource.RESOURCE_URI_HINT, updatedResourceUri);
             }
         }
@@ -625,8 +625,7 @@ public class RegisteredResourceImpl
     /**
      * Create a new resource with updated information
      */
-    public TaskResource clone(TransformationResult transformationResult)
-    throws IOException {
+    public TaskResource clone(TransformationResult transformationResult) throws IOException {
         final int schemePos = this.url.indexOf(':');
         final RegisteredResourceImpl rr = new RegisteredResourceImpl(
                 this.url.substring(schemePos + 1),
@@ -643,20 +642,21 @@ public class RegisteredResourceImpl
         return rr;
     }
 
-    public void update(final File file,
+    public void update(
+            final File file,
             final Dictionary<String, Object> dict,
             final String digest,
             final int priority,
             final String url) {
         this.removeDataFile();
-        if ( file != null ) {
+        if (file != null) {
             this.dataFile = file;
         } else {
-            while ( !this.dictionary.isEmpty() ) {
+            while (!this.dictionary.isEmpty()) {
                 this.dictionary.remove(this.dictionary.keys().nextElement());
             }
             final Enumeration<String> keys = dict.keys();
-            while ( keys.hasMoreElements() ) {
+            while (keys.hasMoreElements()) {
                 final String key = keys.nextElement();
                 this.dictionary.put(key, dict.get(key));
             }
@@ -673,7 +673,7 @@ public class RegisteredResourceImpl
      */
     @Override
     public Version getVersion() {
-        final String vInfo = (String)this.getAttribute(Constants.BUNDLE_VERSION);
+        final String vInfo = (String) this.getAttribute(Constants.BUNDLE_VERSION);
         return (vInfo == null ? null : new Version(vInfo));
     }
 

@@ -18,8 +18,6 @@
  */
 package org.apache.sling.installer.core.impl;
 
-import static org.junit.Assert.fail;
-
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Hashtable;
@@ -36,6 +34,8 @@ import org.apache.sling.installer.core.impl.tasks.BundleUpdateTask;
 import org.apache.sling.installer.core.impl.tasks.MockInstallationListener;
 import org.apache.sling.installer.core.impl.tasks.RefreshBundlesTask;
 
+import static org.junit.Assert.fail;
+
 /** Test the ordering and duplicates elimination of
  * 	OsgiControllerTasks
  */
@@ -43,172 +43,171 @@ public class TaskOrderingTest {
 
     private Set<InstallTask> taskSet;
 
-	@org.junit.Before public void setUp() {
-	    // The data type must be consistent with the "tasks" member
-	    // of the {@link OsgiControllerImpl} class.
-		taskSet = new TreeSet<InstallTask>();
-	}
+    @org.junit.Before
+    public void setUp() {
+        // The data type must be consistent with the "tasks" member
+        // of the {@link OsgiControllerImpl} class.
+        taskSet = new TreeSet<InstallTask>();
+    }
 
-	private static EntityResourceList getRegisteredResource(String url) throws IOException {
+    private static EntityResourceList getRegisteredResource(String url) throws IOException {
         new FileDataStore(new MockBundleContext());
-        final InternalResource internal = InternalResource.create("test",
-                new InstallableResource(url, null, new Hashtable<String, Object>(), null, null, null));
+        final InternalResource internal = InternalResource.create(
+                "test", new InstallableResource(url, null, new Hashtable<String, Object>(), null, null, null));
         RegisteredResourceImpl rr = RegisteredResourceImpl.create(internal);
         TransformationResult[] tr = new DefaultTransformer().transform(rr);
-        if ( tr == null ) {
+        if (tr == null) {
             final TransformationResult result = new TransformationResult();
             result.setId(url);
             result.setResourceType(InstallableResource.TYPE_CONFIG);
-            tr = new TransformationResult[] {
-                      result
-            };
+            tr = new TransformationResult[] {result};
         }
-        rr = (RegisteredResourceImpl)rr.clone(tr[0]);
+        rr = (RegisteredResourceImpl) rr.clone(tr[0]);
 
         final EntityResourceList erl = new EntityResourceList("test", new MockInstallationListener());
-	    erl.addOrUpdate(rr);
-	    return erl;
-	}
+        erl.addOrUpdate(rr);
+        return erl;
+    }
 
-	private void assertOrder(int testId, Collection<InstallTask> actual, InstallTask [] expected) {
-		int index = 0;
-		for(InstallTask t : actual) {
-			if(!t.equals(expected[index])) {
-				fail("Test " + testId + ": at index " + index + ", expected " + expected[index] + " but got " + t);
-			}
-			index++;
-		}
-	}
+    private void assertOrder(int testId, Collection<InstallTask> actual, InstallTask[] expected) {
+        int index = 0;
+        for (InstallTask t : actual) {
+            if (!t.equals(expected[index])) {
+                fail("Test " + testId + ": at index " + index + ", expected " + expected[index] + " but got " + t);
+            }
+            index++;
+        }
+    }
 
-	@org.junit.Test
-	public void testBasicOrdering() throws Exception {
-		int testIndex = 1;
-		final InstallTask [] tasksInOrder = {
-		    new BundleRemoveTask(getRegisteredResource("test:url"), null),
+    @org.junit.Test
+    public void testBasicOrdering() throws Exception {
+        int testIndex = 1;
+        final InstallTask[] tasksInOrder = {
+            new BundleRemoveTask(getRegisteredResource("test:url"), null),
             new BundleInstallTask(getRegisteredResource("test:url"), null),
-		    new BundleUpdateTask(getRegisteredResource("test:url"), null),
+            new BundleUpdateTask(getRegisteredResource("test:url"), null),
             new RefreshBundlesTask(null),
-			new BundleStartTask(null, 0, null)
-		};
+            new BundleStartTask(null, 0, null)
+        };
 
-		taskSet.clear();
-		taskSet.add(tasksInOrder[4]);
-		taskSet.add(tasksInOrder[3]);
-		taskSet.add(tasksInOrder[2]);
+        taskSet.clear();
+        taskSet.add(tasksInOrder[4]);
+        taskSet.add(tasksInOrder[3]);
+        taskSet.add(tasksInOrder[2]);
         taskSet.add(tasksInOrder[1]);
         taskSet.add(tasksInOrder[0]);
 
-		assertOrder(testIndex++, taskSet, tasksInOrder);
+        assertOrder(testIndex++, taskSet, tasksInOrder);
 
-		taskSet.clear();
+        taskSet.clear();
         taskSet.add(tasksInOrder[0]);
         taskSet.add(tasksInOrder[1]);
-		taskSet.add(tasksInOrder[2]);
-		taskSet.add(tasksInOrder[3]);
-		taskSet.add(tasksInOrder[4]);
+        taskSet.add(tasksInOrder[2]);
+        taskSet.add(tasksInOrder[3]);
+        taskSet.add(tasksInOrder[4]);
 
-		assertOrder(testIndex++, taskSet, tasksInOrder);
+        assertOrder(testIndex++, taskSet, tasksInOrder);
 
-		taskSet.clear();
-		taskSet.add(tasksInOrder[3]);
-		taskSet.add(tasksInOrder[2]);
+        taskSet.clear();
+        taskSet.add(tasksInOrder[3]);
+        taskSet.add(tasksInOrder[2]);
         taskSet.add(tasksInOrder[0]);
-		taskSet.add(tasksInOrder[4]);
+        taskSet.add(tasksInOrder[4]);
         taskSet.add(tasksInOrder[1]);
 
-		assertOrder(testIndex++, taskSet, tasksInOrder);
+        assertOrder(testIndex++, taskSet, tasksInOrder);
 
-		taskSet.clear();
-		taskSet.add(tasksInOrder[4]);
+        taskSet.clear();
+        taskSet.add(tasksInOrder[4]);
         taskSet.add(tasksInOrder[0]);
-		taskSet.add(tasksInOrder[2]);
-		taskSet.add(tasksInOrder[3]);
+        taskSet.add(tasksInOrder[2]);
+        taskSet.add(tasksInOrder[3]);
         taskSet.add(tasksInOrder[1]);
 
-		assertOrder(testIndex++, taskSet, tasksInOrder);
-	}
+        assertOrder(testIndex++, taskSet, tasksInOrder);
+    }
 
-	@org.junit.Test
-	public void testMultipleConfigAndBundles() throws Exception {
-		int testIndex = 1;
-		final InstallTask [] tasksInOrder = {
-			new BundleInstallTask(getRegisteredResource("test:someURIa.nothing"), null),
+    @org.junit.Test
+    public void testMultipleConfigAndBundles() throws Exception {
+        int testIndex = 1;
+        final InstallTask[] tasksInOrder = {
+            new BundleInstallTask(getRegisteredResource("test:someURIa.nothing"), null),
             new BundleInstallTask(getRegisteredResource("test:someURIb.nothing"), null),
             new RefreshBundlesTask(null),
-			new BundleStartTask(null, 0, null)
-		};
-
-		taskSet.clear();
-		for(int i = tasksInOrder.length -1 ; i >= 0; i--) {
-			taskSet.add(tasksInOrder[i]);
-		}
-
-		assertOrder(testIndex++, taskSet, tasksInOrder);
+            new BundleStartTask(null, 0, null)
+        };
 
         taskSet.clear();
-        for(int i = 0 ; i < tasksInOrder.length; i++) {
+        for (int i = tasksInOrder.length - 1; i >= 0; i--) {
             taskSet.add(tasksInOrder[i]);
         }
 
         assertOrder(testIndex++, taskSet, tasksInOrder);
-	}
 
-	@org.junit.Test
-	public void testMultipleRefreshAndStart() throws Exception {
-		int testIndex = 1;
-		final InstallTask [] tasksInOrder = {
-		    new BundleRemoveTask(getRegisteredResource("test:url"), null),
+        taskSet.clear();
+        for (int i = 0; i < tasksInOrder.length; i++) {
+            taskSet.add(tasksInOrder[i]);
+        }
+
+        assertOrder(testIndex++, taskSet, tasksInOrder);
+    }
+
+    @org.junit.Test
+    public void testMultipleRefreshAndStart() throws Exception {
+        int testIndex = 1;
+        final InstallTask[] tasksInOrder = {
+            new BundleRemoveTask(getRegisteredResource("test:url"), null),
             new RefreshBundlesTask(null),
-			new BundleStartTask(null, 0, null),
-			new BundleStartTask(null, 1, null)
-		};
-
-		taskSet.clear();
-		taskSet.add(tasksInOrder[3]);
-		taskSet.add(tasksInOrder[3]);
-		taskSet.add(new RefreshBundlesTask(null));
-		taskSet.add(tasksInOrder[2]);
-		taskSet.add(tasksInOrder[2]);
-		taskSet.add(tasksInOrder[1]);
-		taskSet.add(new RefreshBundlesTask(null));
-		taskSet.add(new RefreshBundlesTask(null));
-		taskSet.add(tasksInOrder[0]);
-		taskSet.add(tasksInOrder[3]);
-		taskSet.add(new RefreshBundlesTask(null));
-		taskSet.add(tasksInOrder[3]);
-		taskSet.add(tasksInOrder[2]);
-		taskSet.add(new RefreshBundlesTask(null));
-		taskSet.add(tasksInOrder[2]);
-		taskSet.add(tasksInOrder[1]);
-		taskSet.add(new RefreshBundlesTask(null));
-		taskSet.add(tasksInOrder[1]);
-		taskSet.add(new RefreshBundlesTask(null));
-
-		assertOrder(testIndex++, taskSet, tasksInOrder);
-	}
-
-	@org.junit.Test
-	public void testBundleStartOrder() {
-		int testIndex = 1;
-		final InstallTask [] tasksInOrder = {
-			new BundleStartTask(null, 0, null),
-			new BundleStartTask(null, 1, null),
-			new BundleStartTask(null, 5, null),
-			new BundleStartTask(null, 11, null),
-			new BundleStartTask(null, 51, null)
-		};
-
-		taskSet.clear();
-		for(int i = tasksInOrder.length -1 ; i >= 0; i--) {
-			taskSet.add(tasksInOrder[i]);
-		}
-		assertOrder(testIndex++, taskSet, tasksInOrder);
+            new BundleStartTask(null, 0, null),
+            new BundleStartTask(null, 1, null)
+        };
 
         taskSet.clear();
-        for(int i = 0 ; i < tasksInOrder.length; i++) {
+        taskSet.add(tasksInOrder[3]);
+        taskSet.add(tasksInOrder[3]);
+        taskSet.add(new RefreshBundlesTask(null));
+        taskSet.add(tasksInOrder[2]);
+        taskSet.add(tasksInOrder[2]);
+        taskSet.add(tasksInOrder[1]);
+        taskSet.add(new RefreshBundlesTask(null));
+        taskSet.add(new RefreshBundlesTask(null));
+        taskSet.add(tasksInOrder[0]);
+        taskSet.add(tasksInOrder[3]);
+        taskSet.add(new RefreshBundlesTask(null));
+        taskSet.add(tasksInOrder[3]);
+        taskSet.add(tasksInOrder[2]);
+        taskSet.add(new RefreshBundlesTask(null));
+        taskSet.add(tasksInOrder[2]);
+        taskSet.add(tasksInOrder[1]);
+        taskSet.add(new RefreshBundlesTask(null));
+        taskSet.add(tasksInOrder[1]);
+        taskSet.add(new RefreshBundlesTask(null));
+
+        assertOrder(testIndex++, taskSet, tasksInOrder);
+    }
+
+    @org.junit.Test
+    public void testBundleStartOrder() {
+        int testIndex = 1;
+        final InstallTask[] tasksInOrder = {
+            new BundleStartTask(null, 0, null),
+            new BundleStartTask(null, 1, null),
+            new BundleStartTask(null, 5, null),
+            new BundleStartTask(null, 11, null),
+            new BundleStartTask(null, 51, null)
+        };
+
+        taskSet.clear();
+        for (int i = tasksInOrder.length - 1; i >= 0; i--) {
+            taskSet.add(tasksInOrder[i]);
+        }
+        assertOrder(testIndex++, taskSet, tasksInOrder);
+
+        taskSet.clear();
+        for (int i = 0; i < tasksInOrder.length; i++) {
             taskSet.add(tasksInOrder[i]);
         }
 
         assertOrder(testIndex++, taskSet, tasksInOrder);
-	}
+    }
 }

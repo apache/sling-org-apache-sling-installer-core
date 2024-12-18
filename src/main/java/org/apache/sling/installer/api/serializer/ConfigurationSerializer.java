@@ -32,5 +32,6 @@ public interface ConfigurationSerializer {
      * @param outputStream
      * @throws IOException
      */
-    void serialize(@NotNull Dictionary<String, Object> dictionary, @NotNull OutputStream outputStream) throws IOException;
+    void serialize(@NotNull Dictionary<String, Object> dictionary, @NotNull OutputStream outputStream)
+            throws IOException;
 }

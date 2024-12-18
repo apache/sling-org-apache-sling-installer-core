@@ -36,7 +36,8 @@ public interface UpdatableResourceGroup {
      * Get the current alias for this group.
      * @return The alias or {@code null}.
      */
-    @Nullable String getAlias();
+    @Nullable
+    String getAlias();
 
     /**
      * Set the current alias for this group.
@@ -48,13 +49,15 @@ public interface UpdatableResourceGroup {
      * Get the resource type of the group
      * @return The resource type.
      */
-    @NotNull String getResourceType();
+    @NotNull
+    String getResourceType();
 
     /**
      * Get the unique id
      * @return The unique id
      */
-    @NotNull String getId();
+    @NotNull
+    String getId();
 
     /**
      * Set a new unique id.

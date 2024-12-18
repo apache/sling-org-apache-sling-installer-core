@@ -38,11 +38,9 @@ public class ResourceData {
      * Create an internal resource.
      * @throws IOException if something is wrong
      */
-    public static ResourceData create(
-            final InputStream stream,
-            final Dictionary<String, Object> props)
-    throws IOException {
-        if ( stream == null ) {
+    public static ResourceData create(final InputStream stream, final Dictionary<String, Object> props)
+            throws IOException {
+        if (stream == null) {
             final Dictionary<String, Object> result = new Hashtable<String, Object>();
             final Enumeration<String> e = props.keys();
             while (e.hasMoreElements()) {
@@ -50,10 +48,8 @@ public class ResourceData {
                 result.put(key, props.get(key));
             }
             return new ResourceData(result, null);
-
         }
-        final File dataFile = FileDataStore.SHARED.createNewDataFile(stream,
-                null, null, null);
+        final File dataFile = FileDataStore.SHARED.createNewDataFile(stream, null, null, null);
         return new ResourceData(null, dataFile);
     }
 
@@ -62,8 +58,7 @@ public class ResourceData {
     /** The data file (if copied) */
     private final File dataFile;
 
-    private ResourceData(final Dictionary<String, Object> dict,
-            final File dataFile) {
+    private ResourceData(final Dictionary<String, Object> dict, final File dataFile) {
         this.dictionary = dict;
         this.dataFile = dataFile;
     }
@@ -79,22 +74,21 @@ public class ResourceData {
      * Return the file
      */
     public InputStream getInputStream() throws IOException {
-        if ( this.dataFile != null ) {
+        if (this.dataFile != null) {
             return new FileInputStream(this.dataFile);
         }
         return null;
     }
 
     public String getDigest(final String url, String digest) throws IOException {
-        if ( this.dictionary != null ) {
+        if (this.dictionary != null) {
             return digest != null ? digest : FileDataStore.computeDigest(this.dictionary);
         }
-        if ( digest == null ) {
+        if (digest == null) {
             digest = FileDataStore.computeDigest(this.dataFile);
         }
         FileDataStore.SHARED.updateDigestCache(url, this.dataFile, digest);
         return digest;
-
     }
 
     public File getDataFile() {

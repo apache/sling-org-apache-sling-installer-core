@@ -40,8 +40,7 @@ public abstract class BundleUtil {
 
     public static boolean isSystemBundleFragment(final Bundle installedBundle) {
         final String fragmentHeader = getFragmentHostHeader(installedBundle);
-        return fragmentHeader != null
-            && fragmentHeader.indexOf(Constants.EXTENSION_DIRECTIVE) > 0;
+        return fragmentHeader != null && fragmentHeader.indexOf(Constants.EXTENSION_DIRECTIVE) > 0;
     }
 
     /**
@@ -51,20 +50,20 @@ public abstract class BundleUtil {
      * Or if the bundle is a fragment, it's considered active as well
      */
     public static boolean isBundleActive(final Bundle b) {
-        if ( b.getState() == Bundle.ACTIVE ) {
+        if (b.getState() == Bundle.ACTIVE) {
             return true;
         }
-        if ( b.getState() == Bundle.STARTING && isLazyActivatian(b) ) {
+        if (b.getState() == Bundle.STARTING && isLazyActivatian(b)) {
             return true;
         }
-        return ( getFragmentHostHeader(b) != null );
+        return (getFragmentHostHeader(b) != null);
     }
 
     /**
      * Gets the bundle's Fragment-Host header.
      */
     public static String getFragmentHostHeader(final Bundle b) {
-        return (String) b.getHeaders("").get( Constants.FRAGMENT_HOST );
+        return (String) b.getHeaders("").get(Constants.FRAGMENT_HOST);
     }
 
     /**

@@ -19,5 +19,3 @@
 
 @org.osgi.annotation.versioning.Version("3.2.1")
 package org.apache.sling.installer.api;
-
-

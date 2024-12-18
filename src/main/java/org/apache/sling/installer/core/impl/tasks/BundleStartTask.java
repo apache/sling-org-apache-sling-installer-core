@@ -58,7 +58,7 @@ public class BundleStartTask extends AbstractBundleTask {
 
     @Override
     public void setFinishedState(final ResourceState state, String alias, String error) {
-        if ( this.getResource() != null ) {
+        if (this.getResource() != null) {
             BundleUtil.clearBundleStart(this.getResource());
         }
         super.setFinishedState(state, alias, error);
@@ -72,7 +72,7 @@ public class BundleStartTask extends AbstractBundleTask {
         if (bundleId == 0) {
             String message = "Bundle 0 is the framework bundle, ignoring request to start it";
             this.getLogger().debug(message);
-            if ( this.getResource() != null ) {
+            if (this.getResource() != null) {
                 this.setFinishedState(ResourceState.INSTALLED, null, message);
             }
             return;
@@ -87,7 +87,7 @@ public class BundleStartTask extends AbstractBundleTask {
             return;
         }
 
-        if (BundleUtil.isBundleActive(b) ) {
+        if (BundleUtil.isBundleActive(b)) {
             String message = MessageFormat.format("Bundle already started, no action taken: {0}", bundleId);
             this.getLogger().debug(message);
             this.setFinishedState(ResourceState.INSTALLED, null, message);
@@ -98,8 +98,7 @@ public class BundleStartTask extends AbstractBundleTask {
                 this.setFinishedState(ResourceState.INSTALLED);
                 ctx.log("Started bundle {}", b);
             } catch (final BundleException e) {
-                this.getLogger().info("Could not start bundle {}. Reason: {}. Will retry.",
-                        new Object[] {b, e});
+                this.getLogger().info("Could not start bundle {}. Reason: {}. Will retry.", new Object[] {b, e});
             }
         }
     }

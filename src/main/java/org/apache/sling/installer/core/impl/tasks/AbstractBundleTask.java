@@ -29,8 +29,8 @@ import org.apache.sling.installer.core.impl.AbstractInstallTask;
  */
 public abstract class AbstractBundleTask extends AbstractInstallTask {
 
-    public final static String ATTRIBUTE_BUNDLE_LOCATION = "Bundle-Location";
-    
+    public static final String ATTRIBUTE_BUNDLE_LOCATION = "Bundle-Location";
+
     public AbstractBundleTask(final TaskResourceGroup erl, final TaskSupport support) {
         super(erl, support);
     }
@@ -51,7 +51,7 @@ public abstract class AbstractBundleTask extends AbstractInstallTask {
         final Object providedLevel;
 
         if (this.getResource().getDictionary() != null) {
-            if ( this.getResource().getDictionary().get(InstallableResource.BUNDLE_START_LEVEL) != null ) {
+            if (this.getResource().getDictionary().get(InstallableResource.BUNDLE_START_LEVEL) != null) {
                 providedLevel = this.getResource().getDictionary().get(InstallableResource.BUNDLE_START_LEVEL);
             } else {
                 providedLevel = this.getResource().getDictionary().get(InstallableResource.INSTALLATION_HINT);
@@ -59,9 +59,9 @@ public abstract class AbstractBundleTask extends AbstractInstallTask {
         } else {
             providedLevel = null;
         }
-        if ( providedLevel != null ) {
-            if ( providedLevel instanceof Number ) {
-                startLevel = ((Number)providedLevel).intValue();
+        if (providedLevel != null) {
+            if (providedLevel instanceof Number) {
+                startLevel = ((Number) providedLevel).intValue();
             } else {
                 try {
                     startLevel = Integer.valueOf(providedLevel.toString());
@@ -78,11 +78,11 @@ public abstract class AbstractBundleTask extends AbstractInstallTask {
      */
     protected String getSortableStartLevel() {
         final int startLevel = this.getBundleStartLevel();
-        if ( startLevel == 0 ) {
+        if (startLevel == 0) {
             return "999";
-        } else if ( startLevel < 10 ) {
+        } else if (startLevel < 10) {
             return "00" + String.valueOf(startLevel);
-        } else if ( startLevel < 100 ) {
+        } else if (startLevel < 100) {
             return "0" + String.valueOf(startLevel);
         }
         return String.valueOf(startLevel);

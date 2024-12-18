@@ -81,29 +81,29 @@ public class FileDataStore {
     /**
      * Create a file util instance and detect the installer directory.
      */
-    public FileDataStore( final BundleContext bundleContext ) {
+    public FileDataStore(final BundleContext bundleContext) {
         String location = bundleContext.getProperty(CONFIG_DIR);
 
         // no configured location, use the config dir in the bundle persistent
         // area
-        if ( location == null ) {
-            final File locationFile = bundleContext.getDataFile( DEFAULT_DIR );
-            if ( locationFile != null ) {
+        if (location == null) {
+            final File locationFile = bundleContext.getDataFile(DEFAULT_DIR);
+            if (locationFile != null) {
                 location = locationFile.getAbsolutePath();
             }
         }
 
         // fall back to the current working directory if the platform does
         // not support filesystem based data area
-        if ( location == null ) {
-            location = System.getProperty( "user.dir" ) + File.separatorChar + DEFAULT_DIR;
+        if (location == null) {
+            location = System.getProperty("user.dir") + File.separatorChar + DEFAULT_DIR;
         }
 
         // ensure the file is absolute
-        File locationFile = new File( location );
-        if ( !locationFile.isAbsolute() ) {
-            final File bundleLocationFile = bundleContext.getDataFile( locationFile.getPath() );
-            if ( bundleLocationFile != null ) {
+        File locationFile = new File(location);
+        if (!locationFile.isAbsolute()) {
+            final File bundleLocationFile = bundleContext.getDataFile(locationFile.getPath());
+            if (bundleLocationFile != null) {
                 locationFile = bundleLocationFile;
             }
 
@@ -112,13 +112,13 @@ public class FileDataStore {
         }
 
         // check the location
-        if ( !locationFile.isDirectory() ) {
-            if ( locationFile.exists() ) {
-                throw new IllegalArgumentException( location + " is not a directory" );
+        if (!locationFile.isDirectory()) {
+            if (locationFile.exists()) {
+                throw new IllegalArgumentException(location + " is not a directory");
             }
 
-            if ( !locationFile.mkdirs() ) {
-                throw new IllegalArgumentException( "Cannot create directory " + location );
+            if (!locationFile.mkdirs()) {
+                throw new IllegalArgumentException("Cannot create directory " + location);
             }
         }
 
@@ -149,19 +149,14 @@ public class FileDataStore {
     /**
      * Create a new unique data file.
      */
-    public File createNewDataFile(final InputStream stream,
-            final String url,
-            final String digest,
-            final String hint)
-    throws IOException {
+    public File createNewDataFile(final InputStream stream, final String url, final String digest, final String hint)
+            throws IOException {
         // check if we already have this data
-        if ( digest != null ) {
-            synchronized ( this.digestCache ) {
+        if (digest != null) {
+            synchronized (this.digestCache) {
                 final CacheEntry storedDigest = this.digestCache.get(url);
-                if ( storedDigest != null && storedDigest.digest.equals(digest) ) {
-                    log.debug(
-                            "File {} with digest {} found, returning {}",
-                            url, digest, safePath(storedDigest.file));
+                if (storedDigest != null && storedDigest.digest.equals(digest)) {
+                    log.debug("File {} with digest {} found, returning {}", url, digest, safePath(storedDigest.file));
                     return storedDigest.file;
                 }
             }
@@ -170,15 +165,15 @@ public class FileDataStore {
         final String name = url.substring(pos + 1);
         final String filename = (hint == null ? "rsrc" : hint) + '-' + name + '-' + getNextSerialNumber() + ".ser";
 
-        //replace special characters from the filename that are not allowed by the OS
+        // replace special characters from the filename that are not allowed by the OS
         final String filename2 = filename.replaceAll("[\\*\"/\\\\\\[\\]\\:\\;\\|\\=\\,]+", "_"); // Windows
 
         final File file = this.getDataFile(filename2);
 
         this.copyToLocalStorage(stream, file);
         log.debug("Stream with digest {} copied to {}", digest, safePath(file));
-        if ( digest != null ) {
-            synchronized ( this.digestCache ) {
+        if (digest != null) {
+            synchronized (this.digestCache) {
                 this.digestCache.put(url, new CacheEntry(file, digest));
             }
         }
@@ -188,7 +183,7 @@ public class FileDataStore {
 
     public void updateDigestCache(final String url, final File file, final String digest) {
         log.debug("Updating digest cache for {}, file {}, digest {}", url, safePath(file), digest);
-        synchronized ( this.digestCache ) {
+        synchronized (this.digestCache) {
             this.digestCache.put(url, new CacheEntry(file, digest));
         }
     }
@@ -196,13 +191,12 @@ public class FileDataStore {
     /**
      * Copy data to local storage.
      */
-    protected void copyToLocalStorage(final InputStream data,
-            final File dataFile) throws IOException {
+    protected void copyToLocalStorage(final InputStream data, final File dataFile) throws IOException {
         final OutputStream os = new BufferedOutputStream(new FileOutputStream(dataFile));
         try {
             final byte[] buffer = new byte[16384];
             int count = 0;
-            while( (count = data.read(buffer, 0, buffer.length)) > 0) {
+            while ((count = data.read(buffer, 0, buffer.length)) > 0) {
                 os.write(buffer, 0, count);
             }
             os.flush();
@@ -211,8 +205,7 @@ public class FileDataStore {
         }
     }
 
-    public File createNewDataFile(final String hint, final InputStream stream)
-    throws IOException {
+    public File createNewDataFile(final String hint, final InputStream stream) throws IOException {
         final String filename = (hint == null ? "unknown" : hint) + "-resource-" + getNextSerialNumber() + ".ser";
         final File file = this.getDataFile(filename);
 
@@ -224,9 +217,9 @@ public class FileDataStore {
 
     public void removeFromDigestCache(final String url, final String digest) {
         log.debug("Removing {} / {} from digest cache", url, digest);
-        synchronized ( this.digestCache ) {
+        synchronized (this.digestCache) {
             final CacheEntry entry = this.digestCache.get(url);
-            if ( entry != null && entry.digest.equals(digest) ) {
+            if (entry != null && entry.digest.equals(digest)) {
                 this.digestCache.remove(url);
             }
         }
@@ -241,7 +234,7 @@ public class FileDataStore {
 
                 final byte[] buffer = new byte[8192];
                 int count = 0;
-                while( (count = is.read(buffer, 0, buffer.length)) > 0) {
+                while ((count = is.read(buffer, 0, buffer.length)) > 0) {
                     d.update(buffer, 0, count);
                 }
                 final String result = digestToString(d);
@@ -274,12 +267,12 @@ public class FileDataStore {
 
             final SortedSet<String> sortedKeys = new TreeSet<String>();
             if (data != null) {
-                for(Enumeration<String> e = data.keys(); e.hasMoreElements(); ) {
+                for (Enumeration<String> e = data.keys(); e.hasMoreElements(); ) {
                     final String key = e.nextElement();
                     sortedKeys.add(key);
                 }
             }
-            for(final String key : sortedKeys) {
+            for (final String key : sortedKeys) {
                 oos.writeObject(key);
                 writeValue(data.get(key), oos);
             }
@@ -297,13 +290,13 @@ public class FileDataStore {
     }
 
     private static void writeValue(final Object val, final ObjectOutputStream oos) throws IOException {
-        if ( val instanceof Number ) {
+        if (val instanceof Number) {
             writeValue(String.valueOf(val), oos);
-        } else if ( val instanceof Collection ) {
+        } else if (val instanceof Collection) {
             for (Object o : (Collection<?>) val) {
                 writeValue(o, oos);
             }
-        } else if ( val instanceof String ) {
+        } else if (val instanceof String) {
             oos.writeUTF((String) val);
         } else {
             oos.writeObject(val);

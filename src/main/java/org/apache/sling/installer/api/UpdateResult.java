@@ -53,7 +53,7 @@ public class UpdateResult {
      * @param url Unique url for the resource. This should include the scheme!
      */
     public UpdateResult(final String url) {
-        if ( url == null ) {
+        if (url == null) {
             throw new IllegalArgumentException("url must not be null.");
         }
 

@@ -18,15 +18,13 @@
  */
 package org.apache.sling.installer.api.info;
 
-import org.jetbrains.annotations.Nullable;
-
 import org.apache.sling.installer.api.tasks.InstallTask;
 import org.apache.sling.installer.api.tasks.RegisteredResource;
 import org.apache.sling.installer.api.tasks.ResourceState;
 import org.apache.sling.installer.api.tasks.ResourceTransformer;
+import org.jetbrains.annotations.Nullable;
 import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.framework.Version;
-
 
 /**
  * A resource provides all relevant information about a registered

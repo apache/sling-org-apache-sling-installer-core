@@ -34,10 +34,10 @@ public class BundleInfo {
 
     private static final String MAVEN_SNAPSHOT_MARKER = "SNAPSHOT";
 
-    final public String symbolicName;
-    final public Version version;
-    final public int state;
-    final public long id;
+    public final String symbolicName;
+    public final Version version;
+    public final int state;
+    public final long id;
 
     public BundleInfo(String symbolicName, Version version, int state, long id) {
         this.symbolicName = symbolicName;
@@ -53,8 +53,8 @@ public class BundleInfo {
         this.id = b.getBundleId();
     }
 
-    public static BundleInfo getBundleInfo(final BundleContext bundleContext,
-            final String symbolicName, final String version) {
+    public static BundleInfo getBundleInfo(
+            final BundleContext bundleContext, final String symbolicName, final String version) {
         final Bundle b = getMatchingBundle(bundleContext, symbolicName, version);
         if (b == null) {
             return null;
@@ -65,12 +65,12 @@ public class BundleInfo {
     /**
      * Finds the bundle with given symbolic name in our bundle context.
      */
-    public static Bundle getMatchingBundle(final BundleContext bundleContext,
-            final String bundleSymbolicName, final String version) {
+    public static Bundle getMatchingBundle(
+            final BundleContext bundleContext, final String bundleSymbolicName, final String version) {
         Bundle match = null;
         if (bundleSymbolicName != null) {
             // check if this is the system bundle
-            if ( Constants.SYSTEM_BUNDLE_SYMBOLICNAME.equals(bundleSymbolicName) ) {
+            if (Constants.SYSTEM_BUNDLE_SYMBOLICNAME.equals(bundleSymbolicName)) {
                 return bundleContext.getBundle(Constants.SYSTEM_BUNDLE_LOCATION);
             }
             final List<Bundle> matchingBundles = new ArrayList<Bundle>();
@@ -80,19 +80,20 @@ public class BundleInfo {
                     matchingBundles.add(bundle);
                 }
             }
-            if ( matchingBundles.size() > 0 ) {
+            if (matchingBundles.size() > 0) {
                 final Version searchVersion = (version == null ? null : new Version(version));
-                if ( searchVersion == null || searchVersion.compareTo(matchingBundles.get(0).getVersion()) == 0 ) {
+                if (searchVersion == null
+                        || searchVersion.compareTo(matchingBundles.get(0).getVersion()) == 0) {
                     match = matchingBundles.get(0);
                 }
-                for(int i=1; i<matchingBundles.size(); i++) {
+                for (int i = 1; i < matchingBundles.size(); i++) {
                     final Bundle current = matchingBundles.get(i);
-                    if ( searchVersion == null ) {
-                        if ( match.getVersion().compareTo(current.getVersion()) < 0 ) {
+                    if (searchVersion == null) {
+                        if (match.getVersion().compareTo(current.getVersion()) < 0) {
                             match = current;
                         }
                     } else {
-                        if ( searchVersion.compareTo(current.getVersion()) == 0 ) {
+                        if (searchVersion.compareTo(current.getVersion()) == 0) {
                             match = current;
                             break;
                         }

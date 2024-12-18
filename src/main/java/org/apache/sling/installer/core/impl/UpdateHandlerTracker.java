@@ -64,7 +64,8 @@ public class UpdateHandlerTracker extends SortingServiceTracker<UpdateHandler> {
 
     private void addOrRemoveService(ServiceReference<UpdateHandler> reference, boolean isAdd) {
         final String[] schemes = Converters.standardConverter()
-                .convert(reference.getProperty(UpdateHandler.PROPERTY_SCHEMES)).to(String[].class);
+                .convert(reference.getProperty(UpdateHandler.PROPERTY_SCHEMES))
+                .to(String[].class);
         boolean hasChanged = false;
         for (String scheme : schemes) {
             if (isAdd) {
@@ -92,11 +93,15 @@ public class UpdateHandlerTracker extends SortingServiceTracker<UpdateHandler> {
             if (urlHandler == null) {
                 InstallerResourceUrlHandler service = new InstallerResourceUrlHandler(infoProvider);
                 Dictionary<String, String[]> properties = new Hashtable<>();
-                properties.put(URLConstants.URL_HANDLER_PROTOCOL, schemeUseCount.keySet().toArray(new String[0]));
+                properties.put(
+                        URLConstants.URL_HANDLER_PROTOCOL,
+                        schemeUseCount.keySet().toArray(new String[0]));
                 urlHandler = context.registerService(URLStreamHandlerService.class, service, properties);
             } else {
                 Dictionary<String, String[]> properties = new Hashtable<>();
-                properties.put(URLConstants.URL_HANDLER_PROTOCOL, schemeUseCount.keySet().toArray(new String[0]));
+                properties.put(
+                        URLConstants.URL_HANDLER_PROTOCOL,
+                        schemeUseCount.keySet().toArray(new String[0]));
                 urlHandler.setProperties(properties);
             }
         }

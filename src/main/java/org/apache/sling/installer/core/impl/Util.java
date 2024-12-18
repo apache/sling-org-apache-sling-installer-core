@@ -33,46 +33,46 @@ public class Util {
     /**
      * Set a (final) field during deserialization.
      */
-    public static void setField(final Object obj, final String name, final Object value)
-    throws IOException {
+    public static void setField(final Object obj, final String name, final Object value) throws IOException {
         try {
             final Field field = obj.getClass().getDeclaredField(name);
-            if ( field == null ) {
+            if (field == null) {
                 throw new IOException("Field " + name + " not found in class " + obj.getClass());
             }
             field.setAccessible(true);
             field.set(obj, value);
         } catch (final SecurityException e) {
-            throw (IOException)new IOException().initCause(e);
+            throw (IOException) new IOException().initCause(e);
         } catch (final NoSuchFieldException e) {
-            throw (IOException)new IOException().initCause(e);
+            throw (IOException) new IOException().initCause(e);
         } catch (final IllegalArgumentException e) {
-            throw (IOException)new IOException().initCause(e);
+            throw (IOException) new IOException().initCause(e);
         } catch (final IllegalAccessException e) {
-            throw (IOException)new IOException().initCause(e);
+            throw (IOException) new IOException().initCause(e);
         }
     }
 
     /**
      * Read the manifest from supplied input stream, which is closed before return.
      */
-    private static Manifest getManifest(final RegisteredResource rsrc, final Logger logger)
-    throws IOException {
+    private static Manifest getManifest(final RegisteredResource rsrc, final Logger logger) throws IOException {
         final InputStream ins = rsrc.getInputStream();
 
         Manifest result = null;
 
-        if ( ins != null ) {
+        if (ins != null) {
             JarInputStream jis = null;
             try {
                 jis = new JarInputStream(ins);
-                result= jis.getManifest();
+                result = jis.getManifest();
 
                 // SLING-2288 : if this is a jar file, but the manifest is not the first entry
                 //              log a warning
-                if ( rsrc.getURL().endsWith(".jar") && result == null ) {
-                    logger.warn("Resource {} does not have the manifest as its first entry in the archive. If this is " +
-                                "a bundle, make sure to put the manifest first in the jar file.", rsrc.getURL());
+                if (rsrc.getURL().endsWith(".jar") && result == null) {
+                    logger.warn(
+                            "Resource {} does not have the manifest as its first entry in the archive. If this is "
+                                    + "a bundle, make sure to put the manifest first in the jar file.",
+                            rsrc.getURL());
                 }
             } finally {
 
@@ -97,7 +97,7 @@ public class Util {
         return result;
     }
 
-    final static public class BundleHeaders {
+    public static final class BundleHeaders {
         public String symbolicName;
         public String version;
         public String activationPolicy; // optional
@@ -128,7 +128,7 @@ public class Util {
 
                         // check for activation policy
                         final String actPolicy = m.getMainAttributes().getValue(Constants.BUNDLE_ACTIVATIONPOLICY);
-                        if ( Constants.ACTIVATION_LAZY.equals(actPolicy) ) {
+                        if (Constants.ACTIVATION_LAZY.equals(actPolicy)) {
                             headers.activationPolicy = actPolicy;
                         }
 

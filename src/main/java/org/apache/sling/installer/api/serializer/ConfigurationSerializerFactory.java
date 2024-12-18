@@ -30,9 +30,8 @@ public class ConfigurationSerializerFactory {
         PROPERTIES,
         PROPERTIES_XML
     }
-    
-    private ConfigurationSerializerFactory() {
-    }
+
+    private ConfigurationSerializerFactory() {}
 
     public static @NotNull ConfigurationSerializer create(@NotNull Format format) {
         final ConfigurationSerializer serializer;

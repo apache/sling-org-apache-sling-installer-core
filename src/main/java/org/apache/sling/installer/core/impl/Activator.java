@@ -18,13 +18,13 @@
  */
 package org.apache.sling.installer.core.impl;
 
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
+
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
-
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
 
 import org.apache.sling.installer.api.OsgiInstaller;
 import org.apache.sling.installer.api.ResourceChangeListener;
@@ -73,11 +73,11 @@ public class Activator implements BundleActivator {
 
         // start and register osgi installer service
         this.osgiControllerService.start();
-        final String [] serviceInterfaces = {
-                OsgiInstaller.class.getName(),
-                InfoProvider.class.getName(),
-                ResourceChangeListener.class.getName(),
-                RetryHandler.class.getName()
+        final String[] serviceInterfaces = {
+            OsgiInstaller.class.getName(),
+            InfoProvider.class.getName(),
+            ResourceChangeListener.class.getName(),
+            RetryHandler.class.getName()
         };
         osgiControllerServiceReg = context.registerService(serviceInterfaces, osgiControllerService, props);
 
@@ -89,21 +89,21 @@ public class Activator implements BundleActivator {
      */
     public void stop(final BundleContext context) {
         // stop osgi installer service
-        if ( this.osgiControllerService != null ) {
+        if (this.osgiControllerService != null) {
             this.osgiControllerService.deactivate();
             this.osgiControllerService = null;
         }
-        if ( this.osgiControllerServiceReg != null ) {
+        if (this.osgiControllerServiceReg != null) {
             this.osgiControllerServiceReg.unregister();
             this.osgiControllerServiceReg = null;
         }
         // unregister services
-        for(final ServiceRegistration reg : this.registrations) {
+        for (final ServiceRegistration reg : this.registrations) {
             reg.unregister();
         }
         this.registrations.clear();
         // stop services
-        for(final InternalService service : this.services) {
+        for (final InternalService service : this.services) {
             service.deactivate();
         }
         this.services.clear();
@@ -118,8 +118,10 @@ public class Activator implements BundleActivator {
         mbeanProps.put(Constants.SERVICE_DESCRIPTION, "Apache Sling Installer Controller Service");
         mbeanProps.put(Constants.SERVICE_VENDOR, VENDOR);
         mbeanProps.put("jmx.objectname", new ObjectName("org.apache.sling.installer", jmxProps));
-        ServiceRegistration mbeanReg = context.registerService(new String[] {InstallerMBean.class.getName(),
-                InstallationListener.class.getName()}, new InstallerMBeanImpl(osgiControllerService), mbeanProps);
+        ServiceRegistration mbeanReg = context.registerService(
+                new String[] {InstallerMBean.class.getName(), InstallationListener.class.getName()},
+                new InstallerMBeanImpl(osgiControllerService),
+                mbeanProps);
         registrations.add(mbeanReg);
     }
 
@@ -128,11 +130,8 @@ public class Activator implements BundleActivator {
      */
     private void registerServices(final BundleContext context) throws Exception {
 
-        final Class<?>[] serviceClasses = new Class<?>[] {
-            BundleTaskCreator.class,
-            DefaultTransformer.class
-        };
-        for(final Class<?> serviceClass : serviceClasses) {
+        final Class<?>[] serviceClasses = new Class<?>[] {BundleTaskCreator.class, DefaultTransformer.class};
+        for (final Class<?> serviceClass : serviceClasses) {
             final InternalService service = (InternalService) serviceClass.newInstance();
 
             final Dictionary<String, Object> props = new Hashtable<String, Object>();
@@ -141,28 +140,21 @@ public class Activator implements BundleActivator {
             props.put(Constants.SERVICE_RANKING, new Integer(-100));
 
             final String[] serviceInterfaces;
-            if ( service instanceof ResourceTransformer && service instanceof InstallTaskFactory ) {
-                serviceInterfaces = new String[] {
-                        ResourceTransformer.class.getName(),
-                        InstallTaskFactory.class.getName()
-                };
-            } else if ( service instanceof ResourceTransformer ) {
-                serviceInterfaces = new String[] {
-                        ResourceTransformer.class.getName()
-                };
+            if (service instanceof ResourceTransformer && service instanceof InstallTaskFactory) {
+                serviceInterfaces =
+                        new String[] {ResourceTransformer.class.getName(), InstallTaskFactory.class.getName()};
+            } else if (service instanceof ResourceTransformer) {
+                serviceInterfaces = new String[] {ResourceTransformer.class.getName()};
 
-            } else if ( service instanceof InstallTaskFactory ) {
-                serviceInterfaces = new String[] {
-                        InstallTaskFactory.class.getName()
-                };
+            } else if (service instanceof InstallTaskFactory) {
+                serviceInterfaces = new String[] {InstallTaskFactory.class.getName()};
             } else {
                 serviceInterfaces = null;
             }
-            if ( serviceInterfaces != null ) {
+            if (serviceInterfaces != null) {
                 this.services.add(service);
                 service.init(context, this.osgiControllerService, this.osgiControllerService);
-                this.registrations.add(context.registerService(
-                        serviceInterfaces, service, props));
+                this.registrations.add(context.registerService(serviceInterfaces, service, props));
             }
         }
     }
