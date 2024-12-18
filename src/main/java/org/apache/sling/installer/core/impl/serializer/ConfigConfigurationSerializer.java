@@ -29,7 +29,8 @@ import org.jetbrains.annotations.NotNull;
 public class ConfigConfigurationSerializer implements ConfigurationSerializer {
 
     @Override
-    public void serialize(@NotNull Dictionary<String, Object> dictionary, @NotNull OutputStream outputStream) throws IOException {
+    public void serialize(@NotNull Dictionary<String, Object> dictionary, @NotNull OutputStream outputStream)
+            throws IOException {
         ConfigurationHandler.write(outputStream, dictionary);
     }
 }

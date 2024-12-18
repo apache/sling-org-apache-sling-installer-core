@@ -35,30 +35,30 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface InstallationContext {
 
-	/**
-	 * Schedule a task for execution in the current cycle.
-	 * @param t The install task.
-	 */
-	void addTaskToCurrentCycle(InstallTask t);
-
-	/**
-	 * Schedule a task for execution in the next cycle,
-	 * usually to indicate that a task must be retried
-	 * or the current task is finished and another task
-	 * has to be run.
+    /**
+     * Schedule a task for execution in the current cycle.
      * @param t The install task.
-	 * @deprecated
-	 */
-	@Deprecated
+     */
+    void addTaskToCurrentCycle(InstallTask t);
+
+    /**
+     * Schedule a task for execution in the next cycle,
+     * usually to indicate that a task must be retried
+     * or the current task is finished and another task
+     * has to be run.
+     * @param t The install task.
+     * @deprecated
+     */
+    @Deprecated
     void addTaskToNextCycle(InstallTask t);
 
-	/**
-	 * Make an entry into the audit log - this should be invoked
-	 * by the tasks whenever something has been installed/uninstalled etc.
-	 * @param message The message to log
-	 * @param args Arguments for the message.
-	 */
-	void log(String message, Object... args);
+    /**
+     * Make an entry into the audit log - this should be invoked
+     * by the tasks whenever something has been installed/uninstalled etc.
+     * @param message The message to log
+     * @param args Arguments for the message.
+     */
+    void log(String message, Object... args);
 
     /**
      * Add an async task.
@@ -68,7 +68,7 @@ public interface InstallationContext {
      * @deprecated A async task should return <code>true</code> for {@link InstallTask#isAsynchronousTask()}
      *             and be add with {@link #addTaskToCurrentCycle(InstallTask)}
      */
-	@Deprecated
+    @Deprecated
     void addAsyncTask(InstallTask t);
 
     /**

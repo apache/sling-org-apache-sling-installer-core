@@ -41,7 +41,8 @@ public class TaskSupport {
     }
 
     public BundleRefresher getBundleRefresher() {
-        return new WABundleRefresher(this.bundleContext.getBundle(Constants.SYSTEM_BUNDLE_LOCATION).adapt(FrameworkWiring.class),
+        return new WABundleRefresher(
+                this.bundleContext.getBundle(Constants.SYSTEM_BUNDLE_LOCATION).adapt(FrameworkWiring.class),
                 this.bundleContext);
     }
 }

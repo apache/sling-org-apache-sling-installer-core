@@ -18,20 +18,21 @@
  */
 package org.apache.sling.installer.api;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import java.io.ByteArrayInputStream;
 import java.util.Hashtable;
 
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * Test for the installable resource.
  */
 public class InstallableResourceTest {
 
-    @Test public void testConstructor() {
+    @Test
+    public void testConstructor() {
         // no id
         try {
             new InstallableResource(null, null, new Hashtable<String, Object>(), null, null, null);
@@ -48,15 +49,17 @@ public class InstallableResourceTest {
         }
         new InstallableResource("1", new ByteArrayInputStream("a".getBytes()), null, null, null, null);
         new InstallableResource("1", null, new Hashtable<String, Object>(), null, null, null);
-        new InstallableResource("1",  new ByteArrayInputStream("a".getBytes()), new Hashtable<String, Object>(), null, null, null);
+        new InstallableResource(
+                "1", new ByteArrayInputStream("a".getBytes()), new Hashtable<String, Object>(), null, null, null);
     }
 
-    @Test public void testPriority() {
+    @Test
+    public void testPriority() {
         final InstallableResource defaultPrio =
-            new InstallableResource("1", null, new Hashtable<String, Object>(), null, null, null);
+                new InstallableResource("1", null, new Hashtable<String, Object>(), null, null, null);
         assertEquals(InstallableResource.DEFAULT_PRIORITY, defaultPrio.getPriority());
         final InstallableResource ownPrio =
-            new InstallableResource("1", null, new Hashtable<String, Object>(), null, null, 47);
+                new InstallableResource("1", null, new Hashtable<String, Object>(), null, null, 47);
         assertEquals(47, ownPrio.getPriority());
     }
 }

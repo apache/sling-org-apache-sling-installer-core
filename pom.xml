@@ -31,114 +31,20 @@
     <version>3.14.1-SNAPSHOT</version>
 
     <name>Apache Sling Installer Core</name>
-    <description> 
-        Provides services to install OSGi bundles and configurations
-        by supplying input streams and dictionaries.
-    </description>
+    <description>Provides services to install OSGi bundles and configurations
+        by supplying input streams and dictionaries.</description>
+
+    <scm>
+        <connection>scm:git:https://gitbox.apache.org/repos/asf/sling-org-apache-sling-installer-core.git</connection>
+        <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/sling-org-apache-sling-installer-core.git</developerConnection>
+        <tag>HEAD</tag>
+        <url>https://github.com/apache/sling-org-apache-sling-installer-core.git</url>
+    </scm>
 
     <properties>
         <sling.java.version>8</sling.java.version>
         <project.build.outputTimestamp>2024-01-19T11:50:56Z</project.build.outputTimestamp>
     </properties>
-
-    <scm>
-        <connection>scm:git:https://gitbox.apache.org/repos/asf/sling-org-apache-sling-installer-core.git</connection>
-        <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/sling-org-apache-sling-installer-core.git</developerConnection>
-        <url>https://github.com/apache/sling-org-apache-sling-installer-core.git</url>
-        <tag>HEAD</tag>
-    </scm>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
-                <executions>
-                    <execution>
-                        <id>shade-embedded</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <createSourcesJar>true</createSourcesJar>
-                            <shadeSourcesContent>true</shadeSourcesContent>
-                            <relocations>
-                                <relocation>
-                                    <pattern>org.apache.felix.cm.file</pattern>
-                                    <shadedPattern>org.apache.sling.installer.core.impl.felix.cm</shadedPattern>
-                                </relocation>
-                            </relocations>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <systemProperties>
-                        <property>
-                            <name>osgi.installer.base.dir</name>
-                            <value>${project.build.directory}</value>
-                        </property>
-                        <property>
-                            <name>osgi.installer.pom.version</name>
-                            <value>${project.version}</value>
-                        </property>
-                    </systemProperties>
-                </configuration>
-            </plugin>
-            <plugin>
-                <!-- Create dummy test bundles -->
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>testbundle-1.0</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target name="Create a test bundle">
-                                <jar destfile="${project.build.directory}/${project.artifactId}-${project.version}-testbundle-1.0.jar">
-                                    <fileset dir="${project.build.directory}/classes">
-                                        <include name="META-INF/**" />
-                                    </fileset>
-                                    <manifest>
-                                        <attribute name="Manifest-Version" value="2" />
-                                        <attribute name="Bundle-Name" value="OSGi installer test bundle" />
-                                        <attribute name="Bundle-SymbolicName" value="osgi-installer-testbundle" />
-                                        <attribute name="Bundle-Version" value="1.0.4" />
-                                    </manifest>
-                                </jar>
-                            </target>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <excludePackageNames>
-                        org.apache.sling.installer.core.impl:org.apache.sling.installer.core.impl.tasks:org.apache.sling.installer.core.impl.util
-                    </excludePackageNames>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.rat</groupId>
-                <artifactId>apache-rat-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>src/test/resources/**</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
     <dependencies>
         <!-- OSGi annotations (OSGi R7) -->
@@ -256,4 +162,94 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.4</version>
+                <executions>
+                    <execution>
+                        <id>shade-embedded</id>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <createSourcesJar>true</createSourcesJar>
+                            <shadeSourcesContent>true</shadeSourcesContent>
+                            <relocations>
+                                <relocation>
+                                    <pattern>org.apache.felix.cm.file</pattern>
+                                    <shadedPattern>org.apache.sling.installer.core.impl.felix.cm</shadedPattern>
+                                </relocation>
+                            </relocations>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemProperties>
+                        <property>
+                            <name>osgi.installer.base.dir</name>
+                            <value>${project.build.directory}</value>
+                        </property>
+                        <property>
+                            <name>osgi.installer.pom.version</name>
+                            <value>${project.version}</value>
+                        </property>
+                    </systemProperties>
+                </configuration>
+            </plugin>
+            <plugin>
+                <!-- Create dummy test bundles -->
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>testbundle-1.0</id>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <target name="Create a test bundle">
+                                <jar destfile="${project.build.directory}/${project.artifactId}-${project.version}-testbundle-1.0.jar">
+                                    <fileset dir="${project.build.directory}/classes">
+                                        <include name="META-INF/**" />
+                                    </fileset>
+                                    <manifest>
+                                        <attribute name="Manifest-Version" value="2" />
+                                        <attribute name="Bundle-Name" value="OSGi installer test bundle" />
+                                        <attribute name="Bundle-SymbolicName" value="osgi-installer-testbundle" />
+                                        <attribute name="Bundle-Version" value="1.0.4" />
+                                    </manifest>
+                                </jar>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <excludePackageNames>org.apache.sling.installer.core.impl:org.apache.sling.installer.core.impl.tasks:org.apache.sling.installer.core.impl.util</excludePackageNames>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.rat</groupId>
+                <artifactId>apache-rat-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>src/test/resources/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

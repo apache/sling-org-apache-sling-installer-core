@@ -33,10 +33,10 @@ import org.osgi.service.url.URLStreamHandlerService;
 
 /**
  * URL Handler for schemes used by the UpdateHandlers<br/>
- * 
+ *
  * This is for example used by Apache Felix in the context of populating the {@link ProtectionDomain} of a bundle's class
  * by evaluating the bundle location.
- * 
+ *
  * @see <a href="https://osgi.org/specification/osgi.core/7.0.0/service.url.html#d0e42987">OSGi URL Handlers</a>
  */
 public class InstallerResourceUrlHandler extends AbstractURLStreamHandlerService implements URLStreamHandlerService {
@@ -67,20 +67,18 @@ public class InstallerResourceUrlHandler extends AbstractURLStreamHandlerService
     private static final class InputStreamConnection extends URLConnection {
 
         private final InputStream input;
-        
+
         protected InputStreamConnection(URL url, InputStream input) {
             super(url);
             this.input = input;
         }
 
         @Override
-        public void connect() throws IOException {
-        }
+        public void connect() throws IOException {}
 
         @Override
         public InputStream getInputStream() throws IOException {
             return input;
         }
     }
-
 }

@@ -56,7 +56,7 @@ public abstract class InstallTask implements Comparable<InstallTask> {
      * @return The task resource or {@code null}.
      */
     public TaskResource getResource() {
-        if ( this.resourceGroup != null ) {
+        if (this.resourceGroup != null) {
             return this.resourceGroup.getActiveResource();
         }
         return null;
@@ -76,22 +76,22 @@ public abstract class InstallTask implements Comparable<InstallTask> {
      */
     public abstract void execute(InstallationContext ctx);
 
-	/**
-	 * Tasks are sorted according to this key.
-	 * Therefore this key must uniquely identify this task.
-	 * A typical sort key contains the entity id of the resource
-	 * in execution.
-	 * @return The sorting key.
-	 */
-	public abstract String getSortKey();
+    /**
+     * Tasks are sorted according to this key.
+     * Therefore this key must uniquely identify this task.
+     * A typical sort key contains the entity id of the resource
+     * in execution.
+     * @return The sorting key.
+     */
+    public abstract String getSortKey();
 
-	/**
-	 * Set the finished state for the resource.
-	 * @param state The new state.
-	 */
-	public void setFinishedState(final ResourceState state) {
-	    setFinishedState(state, null, null);
-	}
+    /**
+     * Set the finished state for the resource.
+     * @param state The new state.
+     */
+    public void setFinishedState(final ResourceState state) {
+        setFinishedState(state, null, null);
+    }
 
     /**
      * Set the finished state for the resource and the alias
@@ -114,7 +114,7 @@ public abstract class InstallTask implements Comparable<InstallTask> {
      * @since 1.4
      */
     public void setFinishedState(ResourceState state, String alias, String error) {
-        if ( this.resourceGroup != null ) {
+        if (this.resourceGroup != null) {
             this.resourceGroup.setFinishState(state, alias, error);
         }
     }
@@ -125,17 +125,17 @@ public abstract class InstallTask implements Comparable<InstallTask> {
     }
 
     @Override
-	public final boolean equals(Object o) {
-		if (o instanceof InstallTask) {
-			return getSortKey().equals(((InstallTask)o).getSortKey());
-		}
-		return false;
-	}
+    public final boolean equals(Object o) {
+        if (o instanceof InstallTask) {
+            return getSortKey().equals(((InstallTask) o).getSortKey());
+        }
+        return false;
+    }
 
-	@Override
-	public final int hashCode() {
-		return getSortKey().hashCode();
-	}
+    @Override
+    public final int hashCode() {
+        return getSortKey().hashCode();
+    }
 
     /**
      * All comparisons are based on getSortKey().

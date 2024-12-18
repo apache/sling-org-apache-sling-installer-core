@@ -37,10 +37,9 @@ public class InstallerBundleUpdateTask extends AbstractInstallTask {
 
     private final Integer count;
 
-    public InstallerBundleUpdateTask(final TaskResourceGroup r,
-                                     final TaskSupport taskSupport) {
+    public InstallerBundleUpdateTask(final TaskResourceGroup r, final TaskSupport taskSupport) {
         super(r, taskSupport);
-        this.count = (Integer)this.getResource().getAttribute(InstallTask.ASYNC_ATTR_NAME);
+        this.count = (Integer) this.getResource().getAttribute(InstallTask.ASYNC_ATTR_NAME);
     }
 
     /**
@@ -48,19 +47,20 @@ public class InstallerBundleUpdateTask extends AbstractInstallTask {
      */
     public void execute(final InstallationContext ctx) {
         final Bundle b = this.getBundleContext().getBundle();
-        if ( this.count == null ) {
+        if (this.count == null) {
             // first step: update bundle
 
             try {
                 b.update(getResource().getInputStream());
                 ctx.log("Updated bundle {} from resource {}", b, getResource());
             } catch (final Exception e) {
-                String message = MessageFormat.format("Removing failing tasks due to {0} - unable to retry: {1}", e.getLocalizedMessage(), this);
+                String message = MessageFormat.format(
+                        "Removing failing tasks due to {0} - unable to retry: {1}", e.getLocalizedMessage(), this);
                 getLogger().info(message, e);
                 this.setFinishedState(ResourceState.IGNORED, null, message);
                 ctx.asyncTaskFailed(this);
             }
-        } else if ( this.count == 1 ) {
+        } else if (this.count == 1) {
             // second step: refresh
             this.getBundleRefresher().refreshBundles(ctx, Collections.singletonList(b), false);
         } else {

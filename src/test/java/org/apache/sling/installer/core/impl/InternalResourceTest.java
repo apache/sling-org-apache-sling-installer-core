@@ -18,10 +18,6 @@
  */
 package org.apache.sling.installer.core.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Dictionary;
@@ -32,6 +28,11 @@ import org.apache.sling.installer.core.impl.mocks.MockFileDataStore;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 /**
  * Test for the installable resource.
  */
@@ -39,11 +40,13 @@ public class InternalResourceTest {
 
     private static final String SCHEME = "test";
 
-    @Before public void setDataStore() {
+    @Before
+    public void setDataStore() {
         MockFileDataStore.set();
     }
 
-    @After public void unsetDataStore() {
+    @After
+    public void unsetDataStore() {
         MockFileDataStore.unset();
     }
 
@@ -61,17 +64,16 @@ public class InternalResourceTest {
         assertEquals(2, dict.get("b"));
     }
 
-    @Test public void testSimpleProps() throws IOException {
-        final String[] types = new String[] {InstallableResource.TYPE_CONFIG,
-                InstallableResource.TYPE_PROPERTIES,
-                null, "zip"};
+    @Test
+    public void testSimpleProps() throws IOException {
+        final String[] types =
+                new String[] {InstallableResource.TYPE_CONFIG, InstallableResource.TYPE_PROPERTIES, null, "zip"};
 
-        for(int i=0;i<types.length; i++) {
-            final InstallableResource instRes = new InstallableResource("1",
-                    null, getSimpleDict(), null, types[i], null);
+        for (int i = 0; i < types.length; i++) {
+            final InstallableResource instRes =
+                    new InstallableResource("1", null, getSimpleDict(), null, types[i], null);
 
-            final InternalResource ir = InternalResource.create(SCHEME,
-                    instRes);
+            final InternalResource ir = InternalResource.create(SCHEME, instRes);
             assertEquals(SCHEME + ":1", ir.getURL());
             assertEquals("1", ir.getId());
             assertNotNull(ir.getDictionary());
@@ -80,7 +82,7 @@ public class InternalResourceTest {
             assertIsSimpleDict(ir.getPrivateCopyOfDictionary());
             assertNull(ir.getInputStream());
             assertNull(ir.getPrivateCopyOfFile());
-            if ( "zip".equals(types[i]) ) {
+            if ("zip".equals(types[i])) {
                 assertEquals("zip", ir.getType());
             } else {
                 assertEquals(InstallableResource.TYPE_PROPERTIES, ir.getType());
@@ -90,15 +92,19 @@ public class InternalResourceTest {
         }
     }
 
-    @Test public void testJSONForConfigurations() throws IOException {
-        final String JSONConfig = "{\n" +
-            "\"service.ranking:Integer\" : \"20\",\n" +
-            "\"string.prop\" : \"hello world\",\n" +
-            "\"value\" : true\n" +
-            "}";
-        final InstallableResource rsrc = new InstallableResource("my.component.cfg.json",
-                new ByteArrayInputStream(JSONConfig.getBytes("UTF-8")), null, "digest",
-                null, null);
+    @Test
+    public void testJSONForConfigurations() throws IOException {
+        final String JSONConfig = "{\n" + "\"service.ranking:Integer\" : \"20\",\n"
+                + "\"string.prop\" : \"hello world\",\n"
+                + "\"value\" : true\n"
+                + "}";
+        final InstallableResource rsrc = new InstallableResource(
+                "my.component.cfg.json",
+                new ByteArrayInputStream(JSONConfig.getBytes("UTF-8")),
+                null,
+                "digest",
+                null,
+                null);
 
         final InternalResource ir = InternalResource.create(SCHEME, rsrc);
         assertEquals(InstallableResource.TYPE_PROPERTIES, ir.getType());

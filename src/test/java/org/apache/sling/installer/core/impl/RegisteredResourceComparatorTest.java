@@ -18,10 +18,6 @@
  */
 package org.apache.sling.installer.core.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Dictionary;
@@ -36,27 +32,35 @@ import org.apache.sling.installer.api.tasks.ResourceState;
 import org.apache.sling.installer.api.tasks.TransformationResult;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 public class RegisteredResourceComparatorTest {
 
     private void assertOrder(final Set<RegisteredResource> toTest, final RegisteredResource[] inOrder) {
         assertEquals("Expected sizes to match", toTest.size(), inOrder.length);
         int i = 0;
-        for(final RegisteredResource r : toTest) {
+        for (final RegisteredResource r : toTest) {
             final RegisteredResource ref = inOrder[i];
             assertSame("At index " + i + ", expected toTest and ref to match.", ref, r);
             i++;
         }
     }
 
-    private RegisteredResourceImpl getConfig(String url, Dictionary<String, Object> data, int priority) throws IOException {
+    private RegisteredResourceImpl getConfig(String url, Dictionary<String, Object> data, int priority)
+            throws IOException {
         return getConfig(url, data, priority, null);
     }
 
-    private RegisteredResourceImpl getConfig(String url, Dictionary<String, Object> data, int priority, String digest) throws IOException {
+    private RegisteredResourceImpl getConfig(String url, Dictionary<String, Object> data, int priority, String digest)
+            throws IOException {
         return getConfig(url, data, priority, digest, null);
     }
 
-    private RegisteredResourceImpl getConfig(String url, Dictionary<String, Object> data, int priority, String digest, ResourceState state) throws IOException {
+    private RegisteredResourceImpl getConfig(
+            String url, Dictionary<String, Object> data, int priority, String digest, ResourceState state)
+            throws IOException {
         if (data == null) {
             data = new Hashtable<String, Object>();
             data.put("foo", "bar");
@@ -66,23 +70,21 @@ public class RegisteredResourceComparatorTest {
         final InternalResource internal = InternalResource.create("test", r);
         final RegisteredResourceImpl rr = RegisteredResourceImpl.create(internal);
         TransformationResult[] tr = new DefaultTransformer().transform(rr);
-        if ( tr == null ) {
+        if (tr == null) {
             final TransformationResult result = new TransformationResult();
             result.setId(url);
             result.setResourceType(InstallableResource.TYPE_CONFIG);
-            tr = new TransformationResult[] {
-                      result
-            };
+            tr = new TransformationResult[] {result};
         }
-        final RegisteredResourceImpl result = (RegisteredResourceImpl)rr.clone(tr[0]);
-        if ( state != null ) {
+        final RegisteredResourceImpl result = (RegisteredResourceImpl) rr.clone(tr[0]);
+        if (state != null) {
             result.setState(state, null);
         }
         return result;
     }
-    
+
     private RegisteredResource untransformedResource(String id, int prio) throws IOException {
-        final ByteArrayInputStream is = new ByteArrayInputStream(id.getBytes("UTF-8")); 
+        final ByteArrayInputStream is = new ByteArrayInputStream(id.getBytes("UTF-8"));
         final InstallableResource r = new InstallableResource(id, is, null, id, id, prio);
         final InternalResource internal = InternalResource.create("test", r);
         return RegisteredResourceImpl.create(internal);
@@ -90,12 +92,12 @@ public class RegisteredResourceComparatorTest {
 
     private void assertOrder(RegisteredResource[] inOrder) {
         final SortedSet<RegisteredResource> toTest = new TreeSet<RegisteredResource>();
-        for(int i = inOrder.length - 1 ; i >= 0; i--) {
+        for (int i = inOrder.length - 1; i >= 0; i--) {
             toTest.add(inOrder[i]);
         }
         assertOrder(toTest, inOrder);
         toTest.clear();
-        for(RegisteredResource r : inOrder) {
+        for (RegisteredResource r : inOrder) {
             toTest.add(r);
         }
         assertOrder(toTest, inOrder);
@@ -103,47 +105,47 @@ public class RegisteredResourceComparatorTest {
 
     @Test
     public void testBundleName() {
-        final RegisteredResource [] inOrder = {
-                new MockBundleResource("a", "1.0", 10),
-                new MockBundleResource("b", "1.0", 10),
-                new MockBundleResource("c", "1.0", 10),
-                new MockBundleResource("d", "1.0", 10),
+        final RegisteredResource[] inOrder = {
+            new MockBundleResource("a", "1.0", 10),
+            new MockBundleResource("b", "1.0", 10),
+            new MockBundleResource("c", "1.0", 10),
+            new MockBundleResource("d", "1.0", 10),
         };
         assertOrder(inOrder);
     }
 
     @Test
     public void testBundleVersion() {
-        final RegisteredResource [] inOrder = {
-                new MockBundleResource("a", "1.2.51", 10),
-                new MockBundleResource("a", "1.2.4", 10),
-                new MockBundleResource("a", "1.1.0", 10),
-                new MockBundleResource("a", "1.0.6", 10),
-                new MockBundleResource("a", "1.0.0", 10),
+        final RegisteredResource[] inOrder = {
+            new MockBundleResource("a", "1.2.51", 10),
+            new MockBundleResource("a", "1.2.4", 10),
+            new MockBundleResource("a", "1.1.0", 10),
+            new MockBundleResource("a", "1.0.6", 10),
+            new MockBundleResource("a", "1.0.0", 10),
         };
         assertOrder(inOrder);
     }
 
     @Test
     public void testBundlePriority() {
-        final RegisteredResource [] inOrder = {
-                new MockBundleResource("a", "1.0.0", 101),
-                new MockBundleResource("a", "1.0.0", 10),
-                new MockBundleResource("a", "1.0.0", 0),
-                new MockBundleResource("a", "1.0.0", -5),
+        final RegisteredResource[] inOrder = {
+            new MockBundleResource("a", "1.0.0", 101),
+            new MockBundleResource("a", "1.0.0", 10),
+            new MockBundleResource("a", "1.0.0", 0),
+            new MockBundleResource("a", "1.0.0", -5),
         };
         assertOrder(inOrder);
     }
 
     @Test
     public void testComposite() {
-        final RegisteredResource [] inOrder = {
-                new MockBundleResource("a", "1.2.0"),
-                new MockBundleResource("a", "1.0.0"),
-                new MockBundleResource("b", "1.0.0", 2),
-                new MockBundleResource("b", "1.0.0", 0),
-                new MockBundleResource("c", "1.5.0", -5),
-                new MockBundleResource("c", "1.4.0", 50),
+        final RegisteredResource[] inOrder = {
+            new MockBundleResource("a", "1.2.0"),
+            new MockBundleResource("a", "1.0.0"),
+            new MockBundleResource("b", "1.0.0", 2),
+            new MockBundleResource("b", "1.0.0", 0),
+            new MockBundleResource("c", "1.5.0", -5),
+            new MockBundleResource("c", "1.4.0", 50),
         };
         assertOrder(inOrder);
     }
@@ -161,7 +163,7 @@ public class RegisteredResourceComparatorTest {
     @Test
     public void testSnapshotSerialNumber() {
         // Verify that snapshots with a higher serial number come first
-        final RegisteredResource [] inOrder = new RegisteredResource [3];
+        final RegisteredResource[] inOrder = new RegisteredResource[3];
         inOrder[0] = new MockBundleResource("a", "1.2.0.SNAPSHOT", 0, "digestC");
         inOrder[1] = new MockBundleResource("a", "1.2.0.SNAPSHOT", 0, "digestB");
         inOrder[2] = new MockBundleResource("a", "1.2.0.SNAPSHOT", 0, "digestA");
@@ -170,7 +172,7 @@ public class RegisteredResourceComparatorTest {
 
     @Test
     public void testConfigPriority() throws IOException {
-        final RegisteredResource [] inOrder = new RegisteredResource [3];
+        final RegisteredResource[] inOrder = new RegisteredResource[3];
         inOrder[0] = getConfig("pid", null, 2);
         inOrder[1] = getConfig("pid", null, 1);
         inOrder[2] = getConfig("pid", null, 0);
@@ -179,7 +181,7 @@ public class RegisteredResourceComparatorTest {
 
     @Test
     public void testConfigDigests() throws IOException {
-    	final Dictionary<String, Object> data = new Hashtable<String, Object>();
+        final Dictionary<String, Object> data = new Hashtable<String, Object>();
         data.put("foo", "bar");
         final RegisteredResourceImpl a = getConfig("pid", data, 0);
         data.put("foo", "changed");
@@ -193,7 +195,7 @@ public class RegisteredResourceComparatorTest {
 
     @Test
     public void testConfigPid() throws IOException {
-        final RegisteredResource [] inOrder = new RegisteredResource [3];
+        final RegisteredResource[] inOrder = new RegisteredResource[3];
         inOrder[0] = getConfig("pidA", null, 0);
         inOrder[1] = getConfig("pidB", null, 0);
         inOrder[2] = getConfig("pidC", null, 0);
@@ -202,7 +204,7 @@ public class RegisteredResourceComparatorTest {
 
     @Test
     public void testConfigComposite() throws IOException {
-        final RegisteredResource [] inOrder = new RegisteredResource [4];
+        final RegisteredResource[] inOrder = new RegisteredResource[4];
         inOrder[0] = getConfig("pidA", null, 10);
         inOrder[1] = getConfig("pidA", null, 0);
         inOrder[2] = getConfig("pidB", null, 1);
@@ -212,12 +214,12 @@ public class RegisteredResourceComparatorTest {
 
     @Test
     public void testConfigState() throws IOException {
-        final RegisteredResource [] inOrder = new RegisteredResource [2];
+        final RegisteredResource[] inOrder = new RegisteredResource[2];
         inOrder[0] = getConfig("pidA", null, 100, "a", ResourceState.INSTALLED);
         inOrder[1] = getConfig("pidA", null, 100, "b", ResourceState.INSTALL);
         assertOrder(inOrder);
     }
-    
+
     @Test
     public void testNullEntityId() throws IOException {
         final SortedSet<RegisteredResource> set = new TreeSet<RegisteredResource>();

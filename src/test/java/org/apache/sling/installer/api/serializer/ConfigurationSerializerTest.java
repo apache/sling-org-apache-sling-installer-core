@@ -42,17 +42,18 @@ public class ConfigurationSerializerTest {
     @Parameters(name = "Serializer:{0}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][] {
-                { ConfigurationSerializerFactory.Format.JSON, "config1.json" },
-                { ConfigurationSerializerFactory.Format.CONFIG, "config1.config" },
-                { ConfigurationSerializerFactory.Format.PROPERTIES, "config1.cfg" },
-                { ConfigurationSerializerFactory.Format.PROPERTIES_XML, "config1.xml" }
+            {ConfigurationSerializerFactory.Format.JSON, "config1.json"},
+            {ConfigurationSerializerFactory.Format.CONFIG, "config1.config"},
+            {ConfigurationSerializerFactory.Format.PROPERTIES, "config1.cfg"},
+            {ConfigurationSerializerFactory.Format.PROPERTIES_XML, "config1.xml"}
         });
     }
 
     private final ConfigurationSerializer serializer;
     private final LineIterator lineIterator;
 
-    public ConfigurationSerializerTest(ConfigurationSerializerFactory.Format format, String resource) throws IOException {
+    public ConfigurationSerializerTest(ConfigurationSerializerFactory.Format format, String resource)
+            throws IOException {
         this.serializer = ConfigurationSerializerFactory.create(format);
         InputStream input = this.getClass().getResourceAsStream(resource);
         lineIterator = IOUtils.lineIterator(input, StandardCharsets.UTF_8);
@@ -81,8 +82,8 @@ public class ConfigurationSerializerTest {
                 // ignore lines starting with "*"
                 if (!expectedLine.equals("*")) {
                     // XML output differs between Java 1.8 and Java 11
-                    if ( expectedLine.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"") &&
-                         actualLine.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"") ) {
+                    if (expectedLine.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"")
+                            && actualLine.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"")) {
                         continue;
                     }
                     Assert.assertEquals(expectedLine, actualLine);

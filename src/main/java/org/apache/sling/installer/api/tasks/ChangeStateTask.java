@@ -20,7 +20,6 @@ package org.apache.sling.installer.api.tasks;
 
 import java.util.Map;
 
-
 /**
  * Simple general task, setting the state of a registered resource.
  * @since 1.2
@@ -42,8 +41,7 @@ public class ChangeStateTask extends InstallTask {
      * @param r The resource group to change.
      * @param s The new state.
      */
-    public ChangeStateTask(final TaskResourceGroup r,
-                           final ResourceState s) {
+    public ChangeStateTask(final TaskResourceGroup r, final ResourceState s) {
         this(r, s, null);
     }
 
@@ -54,9 +52,7 @@ public class ChangeStateTask extends InstallTask {
      * @param error An optional description on why the state is changed.
      * @since 1.4
      */
-    public ChangeStateTask(final TaskResourceGroup r,
-                           final ResourceState s,
-                           final String error) {
+    public ChangeStateTask(final TaskResourceGroup r, final ResourceState s, final String error) {
         this(r, s, null, null, error);
     }
 
@@ -68,13 +64,14 @@ public class ChangeStateTask extends InstallTask {
      * @param removeAttributes A optional list of attributes to remove before the state is changed.
      * @since 1.3
      */
-    public ChangeStateTask(final TaskResourceGroup r,
-                           final ResourceState s,
-                           final Map<String, Object> addAttributes,
-                           final String[] removeAttributes) {
+    public ChangeStateTask(
+            final TaskResourceGroup r,
+            final ResourceState s,
+            final Map<String, Object> addAttributes,
+            final String[] removeAttributes) {
         this(r, s, addAttributes, removeAttributes, null);
     }
-    
+
     /**
      * Change the state of the task
      * @param r The resource group to change.
@@ -84,11 +81,12 @@ public class ChangeStateTask extends InstallTask {
      * @param error An optional description on why the state is changed.
      * @since 1.4
      */
-    public ChangeStateTask(final TaskResourceGroup r,
-                           final ResourceState s,
-                           final Map<String, Object> addAttributes,
-                           final String[] removeAttributes,
-                           String error) {
+    public ChangeStateTask(
+            final TaskResourceGroup r,
+            final ResourceState s,
+            final Map<String, Object> addAttributes,
+            final String[] removeAttributes,
+            String error) {
         super(r);
         this.state = s;
         this.addAttributes = addAttributes;
@@ -101,14 +99,14 @@ public class ChangeStateTask extends InstallTask {
      */
     public void execute(final InstallationContext ctx) {
         final TaskResource resource = this.getResource();
-        if ( resource != null ) {
-            if ( this.removeAttributes != null ) {
-                for(final String name : this.removeAttributes ) {
+        if (resource != null) {
+            if (this.removeAttributes != null) {
+                for (final String name : this.removeAttributes) {
                     resource.setAttribute(name, null);
                 }
             }
-            if ( this.addAttributes != null ) {
-                for(final Map.Entry<String, Object> entry : this.addAttributes.entrySet()) {
+            if (this.addAttributes != null) {
+                for (final Map.Entry<String, Object> entry : this.addAttributes.entrySet()) {
                     resource.setAttribute(entry.getKey(), entry.getValue());
                 }
             }

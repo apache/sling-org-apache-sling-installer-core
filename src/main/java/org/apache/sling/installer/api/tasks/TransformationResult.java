@@ -137,5 +137,4 @@ public class TransformationResult {
         return "TransformationResult [resourceType=" + resourceType + ", id=" + id + ", version=" + version
                 + ", attributes=" + attributes + "]";
     }
-
 }

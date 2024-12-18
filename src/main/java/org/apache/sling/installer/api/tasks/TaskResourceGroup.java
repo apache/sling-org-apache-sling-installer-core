@@ -21,7 +21,6 @@ package org.apache.sling.installer.api.tasks;
 import java.util.Iterator;
 
 import org.jetbrains.annotations.Nullable;
-
 import org.osgi.annotation.versioning.ProviderType;
 
 /**
@@ -30,7 +29,6 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface TaskResourceGroup {
-
 
     /**
      * Return the first resource if it either needs to be installed or uninstalled.

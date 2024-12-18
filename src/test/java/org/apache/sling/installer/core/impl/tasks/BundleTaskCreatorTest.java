@@ -18,10 +18,6 @@
  */
 package org.apache.sling.installer.core.impl.tasks;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.SortedSet;
@@ -36,40 +32,40 @@ import org.apache.sling.installer.core.impl.MockBundleResource;
 import org.junit.Test;
 import org.osgi.framework.Bundle;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class BundleTaskCreatorTest {
-	public static final String SN = "TestSymbolicName";
+    public static final String SN = "TestSymbolicName";
 
-	private SortedSet<InstallTask> getTasks(TaskResource [] resources, BundleTaskCreator btc) throws IOException {
-	    final SortedSet<TaskResource> sortedResources = new TreeSet<TaskResource>();
-	    for(final TaskResource rr : resources) {
-	        sortedResources.add(rr);
-	    }
-		final SortedSet<InstallTask> tasks = new TreeSet<InstallTask>();
-        for(final TaskResource r : sortedResources) {
-            final EntityResourceList erl = new EntityResourceList(r.getEntityId(), new MockInstallationListener());
-            erl.addOrUpdate(((MockBundleResource)r).getRegisteredResourceImpl());
-            assertNotNull(erl.getActiveResource());
-  		    tasks.add(btc.createTask(erl));
+    private SortedSet<InstallTask> getTasks(TaskResource[] resources, BundleTaskCreator btc) throws IOException {
+        final SortedSet<TaskResource> sortedResources = new TreeSet<TaskResource>();
+        for (final TaskResource rr : resources) {
+            sortedResources.add(rr);
         }
-		return tasks;
-	}
+        final SortedSet<InstallTask> tasks = new TreeSet<InstallTask>();
+        for (final TaskResource r : sortedResources) {
+            final EntityResourceList erl = new EntityResourceList(r.getEntityId(), new MockInstallationListener());
+            erl.addOrUpdate(((MockBundleResource) r).getRegisteredResourceImpl());
+            assertNotNull(erl.getActiveResource());
+            tasks.add(btc.createTask(erl));
+        }
+        return tasks;
+    }
 
-	@Test
-	public void testSingleBundleNew() throws IOException {
-		final TaskResource [] r = {
-		        new MockBundleResource(SN, "1.0")
-		};
+    @Test
+    public void testSingleBundleNew() throws IOException {
+        final TaskResource[] r = {new MockBundleResource(SN, "1.0")};
         final MockBundleTaskCreator c = new MockBundleTaskCreator();
-		final SortedSet<InstallTask> s = getTasks(r, c);
-		assertEquals("Expected one task", 1, s.size());
-		assertTrue("Expected a BundleInstallTask", s.first() instanceof BundleInstallTask);
-	}
+        final SortedSet<InstallTask> s = getTasks(r, c);
+        assertEquals("Expected one task", 1, s.size());
+        assertTrue("Expected a BundleInstallTask", s.first() instanceof BundleInstallTask);
+    }
 
-	@Test
+    @Test
     public void testSingleBundleAlreadyInstalled() throws IOException {
-        final TaskResource [] r = {
-                new MockBundleResource(SN, "1.0")
-        };
+        final TaskResource[] r = {new MockBundleResource(SN, "1.0")};
 
         {
             final MockBundleTaskCreator c = new MockBundleTaskCreator();
@@ -90,9 +86,7 @@ public class BundleTaskCreatorTest {
 
     @Test
     public void testBundleUpgrade() throws IOException {
-        final TaskResource [] r = {
-                new MockBundleResource(SN, "1.1")
-        };
+        final TaskResource[] r = {new MockBundleResource(SN, "1.1")};
 
         {
             final MockBundleTaskCreator c = new MockBundleTaskCreator();
@@ -105,10 +99,7 @@ public class BundleTaskCreatorTest {
 
     @Test
     public void testBundleUpgradeBothRegistered() throws IOException {
-        final TaskResource [] r = {
-                new MockBundleResource(SN, "1.1"),
-                new MockBundleResource(SN, "1.0")
-        };
+        final TaskResource[] r = {new MockBundleResource(SN, "1.1"), new MockBundleResource(SN, "1.0")};
 
         {
             final MockBundleTaskCreator c = new MockBundleTaskCreator();
@@ -116,16 +107,13 @@ public class BundleTaskCreatorTest {
             final SortedSet<InstallTask> s = getTasks(r, c);
             assertEquals("Expected two tasks", 2, s.size());
             assertTrue("Expected a ChangeStateTask", s.first() instanceof ChangeStateTask);
-            assertTrue("Expected a BundleUpdateTask" , s.toArray()[1] instanceof BundleUpdateTask);
+            assertTrue("Expected a BundleUpdateTask", s.toArray()[1] instanceof BundleUpdateTask);
         }
     }
 
     @Test
     public void testBundleUpgradeBothRegisteredReversed() throws IOException {
-        final TaskResource [] r = {
-                new MockBundleResource(SN, "1.0"),
-                new MockBundleResource(SN, "1.1")
-        };
+        final TaskResource[] r = {new MockBundleResource(SN, "1.0"), new MockBundleResource(SN, "1.1")};
 
         {
             final MockBundleTaskCreator c = new MockBundleTaskCreator();
@@ -133,7 +121,7 @@ public class BundleTaskCreatorTest {
             final SortedSet<InstallTask> s = getTasks(r, c);
             assertEquals("Expected two tasks", 2, s.size());
             assertTrue("Expected a ChangeStateTask", s.first() instanceof ChangeStateTask);
-            assertTrue("Expected a BundleUpdateTask" , s.toArray()[1] instanceof BundleUpdateTask);
+            assertTrue("Expected a BundleUpdateTask", s.toArray()[1] instanceof BundleUpdateTask);
         }
     }
 
@@ -142,9 +130,7 @@ public class BundleTaskCreatorTest {
         // Need to use OSGi-compliant version number, in bundles
         // bnd and other tools generate correct numbers.
         final String v = "2.0.7.SNAPSHOT";
-        final TaskResource [] r = {
-                new MockBundleResource(SN, v)
-        };
+        final TaskResource[] r = {new MockBundleResource(SN, v)};
 
         {
             final MockBundleTaskCreator c = new MockBundleTaskCreator();
@@ -158,9 +144,7 @@ public class BundleTaskCreatorTest {
     @Test
     public void testBundleRemoveSingle() throws IOException {
         final String version = "1.0";
-        final MockBundleResource [] r = {
-                new MockBundleResource(SN, version)
-        };
+        final MockBundleResource[] r = {new MockBundleResource(SN, version)};
         r[0].setState(ResourceState.UNINSTALL);
 
         {
@@ -174,12 +158,10 @@ public class BundleTaskCreatorTest {
 
     @Test
     public void testBundleRemoveMultiple() throws IOException {
-        final MockBundleResource [] r = {
-                new MockBundleResource(SN, "1.0"),
-                new MockBundleResource(SN, "1.1"),
-                new MockBundleResource(SN, "2.0")
+        final MockBundleResource[] r = {
+            new MockBundleResource(SN, "1.0"), new MockBundleResource(SN, "1.1"), new MockBundleResource(SN, "2.0")
         };
-        for(MockBundleResource x : r) {
+        for (MockBundleResource x : r) {
             x.setState(ResourceState.UNINSTALL);
         }
 
@@ -198,15 +180,14 @@ public class BundleTaskCreatorTest {
 
     @Test
     public void testDowngradeOfRemovedResource() throws IOException {
-        final MockBundleResource [] r = {
-                new MockBundleResource(SN, "1.0.0"),
-                new MockBundleResource(SN, "1.1.0"),
+        final MockBundleResource[] r = {
+            new MockBundleResource(SN, "1.0.0"), new MockBundleResource(SN, "1.1.0"),
         };
 
         // Simulate V1.1 installed but resource is gone -> downgrade to 1.0
         r[1].setState(ResourceState.UNINSTALL);
 
-       {
+        {
             final MockBundleTaskCreator c = new MockBundleTaskCreator();
             c.addBundleInfo(SN, "1.1.0", Bundle.ACTIVE);
 
@@ -214,11 +195,14 @@ public class BundleTaskCreatorTest {
             assertEquals("Expected two tasks", 2, s.size());
             final Iterator<InstallTask> i = s.iterator();
             final InstallTask first = i.next();
-            assertTrue("Expected a ChangeStateTask:" + first , first instanceof ChangeStateTask);
+            assertTrue("Expected a ChangeStateTask:" + first, first instanceof ChangeStateTask);
             final InstallTask second = i.next();
             assertTrue("Expected a BundleRemoveTask", second instanceof BundleRemoveTask);
-            final BundleRemoveTask t = (BundleRemoveTask)second;
-            assertEquals("Remove should be to V1.1", r[1].getEntityId(), t.getResource().getEntityId());
+            final BundleRemoveTask t = (BundleRemoveTask) second;
+            assertEquals(
+                    "Remove should be to V1.1",
+                    r[1].getEntityId(),
+                    t.getResource().getEntityId());
         }
     }
 }

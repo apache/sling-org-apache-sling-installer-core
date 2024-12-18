@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.sling.installer.core.impl;
 
 import org.apache.sling.installer.api.event.InstallationEvent;
@@ -33,7 +32,7 @@ public class InstallerMBeanImpl implements InstallationListener, InstallerMBean 
         this.infoProvider = infoProvider;
     }
 
-    //~---------------------------------------< InstallationListener >
+    // ~---------------------------------------< InstallationListener >
 
     @Override
     public void onEvent(InstallationEvent event) {
@@ -51,7 +50,7 @@ public class InstallerMBeanImpl implements InstallationListener, InstallerMBean 
         lastEventTime = System.currentTimeMillis();
     }
 
-    //~----------------------------------------< InstallerMBean >
+    // ~----------------------------------------< InstallerMBean >
 
     @Override
     public int getActiveResourceCount() {

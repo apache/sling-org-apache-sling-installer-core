@@ -19,10 +19,8 @@
 package org.apache.sling.installer.api.tasks;
 
 import org.jetbrains.annotations.Nullable;
-
 import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.framework.Version;
-
 
 /**
  * A task resource is a registered resource which has been

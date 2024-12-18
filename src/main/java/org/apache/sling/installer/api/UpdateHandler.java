@@ -24,7 +24,6 @@ import java.util.Map;
 
 import org.osgi.annotation.versioning.ConsumerType;
 
-
 /**
  * An update handler is a service handling updates of resources through other ways
  * than the installer, e.g. handling a configuration change through the web console
@@ -49,9 +48,7 @@ public interface UpdateHandler {
      * @return If the handler could handle/perist the resource an update result is returned
      *         otherwise the handler should return <code>null</code>
      */
-    UpdateResult handleRemoval(String resourceType,
-            String id,
-            String url);
+    UpdateResult handleRemoval(String resourceType, String id, String url);
 
     /**
      * Handle the update of a resource
@@ -63,7 +60,8 @@ public interface UpdateHandler {
      * @return If the handler could handle/perist the resource an update result is returned
      *         otherwise the handler should return <code>null</code>
      */
-    UpdateResult handleUpdate(String resourceType,
+    UpdateResult handleUpdate(
+            String resourceType,
             String id,
             String url,
             Dictionary<String, Object> dict,
@@ -79,9 +77,6 @@ public interface UpdateHandler {
      * @return If the handler could handle/perist the resource an update result is returned
      *         otherwise the handler should return <code>null</code>
      */
-    UpdateResult handleUpdate(String resourceType,
-            String id,
-            String url,
-            InputStream is,
-            Map<String, Object> attributes);
+    UpdateResult handleUpdate(
+            String resourceType, String id, String url, InputStream is, Map<String, Object> attributes);
 }

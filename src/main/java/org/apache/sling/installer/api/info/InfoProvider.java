@@ -20,7 +20,6 @@ package org.apache.sling.installer.api.info;
 
 import org.osgi.annotation.versioning.ProviderType;
 
-
 /**
  * The info provider delivers information about the current state of the
  * OSGi installer

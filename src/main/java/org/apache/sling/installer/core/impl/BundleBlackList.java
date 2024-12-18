@@ -71,17 +71,16 @@ public class BundleBlackList {
     private Map<String, VersionRange> blacklistMap = new HashMap<String, VersionRange>();
 
     private void getBlackListFromBootstrapFile(BufferedReader r) throws IOException {
-            String line = null;
-            while ((line = r.readLine()) != null) {
-                line = line.trim();
-                String bundleSymbolicName = null;
-                VersionRange versionRange = null;
-                if (line.length() > 0 && line.startsWith(UNINSTALL_PREFIX)) {
-                    final String[] s = line.split(" ");
-                    extractBlackList(bundleSymbolicName, versionRange, s, 1, 2);
-                }
+        String line = null;
+        while ((line = r.readLine()) != null) {
+            line = line.trim();
+            String bundleSymbolicName = null;
+            VersionRange versionRange = null;
+            if (line.length() > 0 && line.startsWith(UNINSTALL_PREFIX)) {
+                final String[] s = line.split(" ");
+                extractBlackList(bundleSymbolicName, versionRange, s, 1, 2);
             }
-
+        }
     }
 
     public boolean isBlacklisted(String symbolicName, Version version) {
@@ -92,7 +91,12 @@ public class BundleBlackList {
         return false;
     }
 
-    private void extractBlackList(String bundleSymbolicName, VersionRange versionRange, final String[] s, int posSymbolicName, int posVersionRange) {
+    private void extractBlackList(
+            String bundleSymbolicName,
+            VersionRange versionRange,
+            final String[] s,
+            int posSymbolicName,
+            int posVersionRange) {
         if (s.length > posSymbolicName) {
             bundleSymbolicName = s[posSymbolicName].trim();
         }

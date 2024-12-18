@@ -46,7 +46,7 @@ public class WABundleRefresher implements BundleRefresher, FrameworkListener {
     private volatile long refreshEventCount;
 
     /** Lock object for syncing. */
-    private  final Object lock = new Object();
+    private final Object lock = new Object();
 
     private final BundleContext bundleContext;
 
@@ -58,42 +58,43 @@ public class WABundleRefresher implements BundleRefresher, FrameworkListener {
     /**
      * @see org.apache.sling.installer.core.impl.util.BundleRefresher#refreshBundles(org.apache.sling.installer.api.tasks.InstallationContext, java.util.List, boolean)
      */
-    public void refreshBundles(final InstallationContext ctx,
-            final List<Bundle> bundles,
-            final boolean wait) {
-        if ( bundles == null || bundles.size() > 0 ) {
-            if ( bundles == null ) {
+    public void refreshBundles(final InstallationContext ctx, final List<Bundle> bundles, final boolean wait) {
+        if (bundles == null || bundles.size() > 0) {
+            if (bundles == null) {
                 ctx.log("Full package refreshing");
             } else {
                 ctx.log("Refreshing {} bundles: {}", bundles.size(), bundles);
             }
-            if ( !wait ) {
+            if (!wait) {
                 this.frameworkWiring.refreshBundles(bundles == null ? null : bundles);
             } else {
                 this.refreshEventCount = 0;
                 this.frameworkWiring.refreshBundles(bundles == null ? null : bundles, this);
                 final long end = System.currentTimeMillis() + (MAX_REFRESH_PACKAGES_WAIT_SECONDS * 1000);
                 do {
-                    synchronized ( this.lock ) {
+                    synchronized (this.lock) {
                         final long waitTime = end - System.currentTimeMillis();
-                        if ( this.refreshEventCount < 1 && waitTime > 0 ) {
+                        if (this.refreshEventCount < 1 && waitTime > 0) {
                             try {
-                                ctx.log("Waiting up to {} seconds for bundles refresh", MAX_REFRESH_PACKAGES_WAIT_SECONDS);
+                                ctx.log(
+                                        "Waiting up to {} seconds for bundles refresh",
+                                        MAX_REFRESH_PACKAGES_WAIT_SECONDS);
                                 this.lock.wait(waitTime);
                             } catch (final InterruptedException ignore) {
                                 // ignore
                             }
-                            if ( end <= System.currentTimeMillis() && this.refreshEventCount < 1 ) {
-                                logger.warn("No FrameworkEvent.PACKAGES_REFRESHED event received within {}"
-                                        + " seconds after refresh, aborting wait.",
+                            if (end <= System.currentTimeMillis() && this.refreshEventCount < 1) {
+                                logger.warn(
+                                        "No FrameworkEvent.PACKAGES_REFRESHED event received within {}"
+                                                + " seconds after refresh, aborting wait.",
                                         MAX_REFRESH_PACKAGES_WAIT_SECONDS);
                                 this.refreshEventCount++;
                             }
                         }
                     }
-                } while ( this.refreshEventCount < 1);
+                } while (this.refreshEventCount < 1);
             }
-            if ( bundles == null ) {
+            if (bundles == null) {
                 ctx.log("Done full package refresh");
             } else {
                 ctx.log("Done refreshing {} bundles", bundles.size());
@@ -107,8 +108,8 @@ public class WABundleRefresher implements BundleRefresher, FrameworkListener {
     public boolean isInstallerBundleAffected(final List<Bundle> bundles) {
         final long installerId = this.bundleContext.getBundle().getBundleId();
         final Collection<Bundle> dependencyClosure = this.frameworkWiring.getDependencyClosure(bundles);
-        for(final Bundle b : dependencyClosure) {
-            if ( b.getBundleId() == installerId ) {
+        for (final Bundle b : dependencyClosure) {
+            if (b.getBundleId() == installerId) {
                 return true;
             }
         }

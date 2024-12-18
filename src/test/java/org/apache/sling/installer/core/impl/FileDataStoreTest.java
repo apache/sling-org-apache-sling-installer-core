@@ -32,7 +32,7 @@ import static org.junit.Assert.assertNotEquals;
 public class FileDataStoreTest {
     @Test
     public void testDigestFromDictionary() {
-        Dictionary<String,Object> dict1 = new Hashtable<>();
+        Dictionary<String, Object> dict1 = new Hashtable<>();
         List<String> l1 = new ArrayList<>();
         l1.add("x");
         l1.add("y");
@@ -40,7 +40,7 @@ public class FileDataStoreTest {
         dict1.put("foo", new int[] {3, 2, 7});
         String dig1 = FileDataStore.computeDigest(dict1);
 
-        Dictionary<String,Object> dict2 = new Hashtable<>();
+        Dictionary<String, Object> dict2 = new Hashtable<>();
         List<String> l2 = new LinkedList<>();
         l2.add("x");
         l2.add("y");
@@ -52,7 +52,7 @@ public class FileDataStoreTest {
 
     @Test
     public void testDigestFromDictionaryNegative1() {
-        Dictionary<String,Object> dict1 = new Hashtable<>();
+        Dictionary<String, Object> dict1 = new Hashtable<>();
         List<String> l1 = new ArrayList<>();
         l1.add("y");
         l1.add("x");
@@ -60,7 +60,7 @@ public class FileDataStoreTest {
         dict1.put("foo", new int[] {3, 2, 7});
         String dig1 = FileDataStore.computeDigest(dict1);
 
-        Dictionary<String,Object> dict2 = new Hashtable<>();
+        Dictionary<String, Object> dict2 = new Hashtable<>();
         List<String> l2 = new LinkedList<>();
         l2.add("x");
         l2.add("y");
@@ -72,7 +72,7 @@ public class FileDataStoreTest {
 
     @Test
     public void testDigestFromDictionaryNegative2() {
-        Dictionary<String,Object> dict1 = new Hashtable<>();
+        Dictionary<String, Object> dict1 = new Hashtable<>();
         List<String> l1 = new ArrayList<>();
         l1.add("x");
         l1.add("y");
@@ -80,7 +80,7 @@ public class FileDataStoreTest {
         dict1.put("foo", new int[] {7, 2, 3});
         String dig1 = FileDataStore.computeDigest(dict1);
 
-        Dictionary<String,Object> dict2 = new Hashtable<>();
+        Dictionary<String, Object> dict2 = new Hashtable<>();
         List<String> l2 = new LinkedList<>();
         l2.add("x");
         l2.add("y");

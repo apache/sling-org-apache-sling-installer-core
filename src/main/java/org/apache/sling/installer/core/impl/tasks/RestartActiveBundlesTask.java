@@ -1,5 +1,5 @@
 /*
-k * Licensed to the Apache Software Foundation (ASF) under one
+ * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
  * regarding copyright ownership.  The ASF licenses this file
@@ -46,11 +46,13 @@ public class RestartActiveBundlesTask extends AbstractInstallTask {
         // calculate bundle set
         @SuppressWarnings("unchecked")
         Set<Long> ids = (Set<Long>) erl.getActiveResource().getAttribute(ATTR);
-        if ( ids == null ) {
+        if (ids == null) {
             ids = new HashSet<Long>();
         }
-        for(final Bundle bundle : support.getBundleContext().getBundles()) {
-            if ( bundle.getBundleId() > 0 && BundleUtil.getFragmentHostHeader(bundle) == null && bundle.getState() == Bundle.ACTIVE ) {
+        for (final Bundle bundle : support.getBundleContext().getBundles()) {
+            if (bundle.getBundleId() > 0
+                    && BundleUtil.getFragmentHostHeader(bundle) == null
+                    && bundle.getState() == Bundle.ACTIVE) {
                 ids.add(bundle.getBundleId());
             }
         }
@@ -62,15 +64,15 @@ public class RestartActiveBundlesTask extends AbstractInstallTask {
         @SuppressWarnings("unchecked")
         final Set<Long> ids = (Set<Long>) this.getResource().getAttribute(ATTR);
         int started = 0;
-        if ( ids != null ) {
+        if (ids != null) {
             final Set<Long> remove = new HashSet<Long>();
-            for(final Long id : ids) {
+            for (final Long id : ids) {
                 final Bundle bundle = this.getBundleContext().getBundle(id);
-                if ( bundle != null
-                     && bundle.getState() != Bundle.ACTIVE
-                     && bundle.getState() != Bundle.STARTING
-                     && bundle.getState() != Bundle.STOPPING
-                     && bundle.getState() != Bundle.UNINSTALLED) {
+                if (bundle != null
+                        && bundle.getState() != Bundle.ACTIVE
+                        && bundle.getState() != Bundle.STARTING
+                        && bundle.getState() != Bundle.STOPPING
+                        && bundle.getState() != Bundle.UNINSTALLED) {
                     try {
                         bundle.start();
                         started++;
@@ -84,7 +86,11 @@ public class RestartActiveBundlesTask extends AbstractInstallTask {
                     }
                 } else {
                     // bundle might be null(!)
-                    getLogger().debug("Bundle does not need restart: {} (state {})", bundle, (bundle == null ? "uninstalled" : bundle.getState()));
+                    getLogger()
+                            .debug(
+                                    "Bundle does not need restart: {} (state {})",
+                                    bundle,
+                                    (bundle == null ? "uninstalled" : bundle.getState()));
                     remove.add(id);
                 }
             }
