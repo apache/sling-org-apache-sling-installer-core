@@ -28,7 +28,7 @@
     </parent>
 
     <artifactId>org.apache.sling.installer.core</artifactId>
-    <version>3.14.1-SNAPSHOT</version>
+    <version>3.14.2</version>
 
     <name>Apache Sling Installer Core</name>
     <description>Provides services to install OSGi bundles and configurations
@@ -37,13 +37,13 @@
     <scm>
         <connection>scm:git:https://gitbox.apache.org/repos/asf/sling-org-apache-sling-installer-core.git</connection>
         <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/sling-org-apache-sling-installer-core.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>org.apache.sling.installer.core-3.14.2</tag>
         <url>https://github.com/apache/sling-org-apache-sling-installer-core.git</url>
     </scm>
 
     <properties>
         <sling.java.version>8</sling.java.version>
-        <project.build.outputTimestamp>2024-01-19T11:50:56Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2024-12-18T12:23:32Z</project.build.outputTimestamp>
     </properties>
 
     <dependencies>
