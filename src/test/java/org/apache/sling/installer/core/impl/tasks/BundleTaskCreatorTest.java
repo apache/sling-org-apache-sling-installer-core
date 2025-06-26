@@ -142,6 +142,19 @@ public class BundleTaskCreatorTest {
     }
 
     @Test
+    public void testBundleUpgradeStartLevelChanged() throws IOException {
+        final TaskResource[] r = {new MockBundleResource(SN, "1.1")};
+
+        {
+            final MockBundleTaskCreator c = new MockBundleTaskCreator(20, 19);
+            c.addBundleInfo(SN, "1.1", Bundle.ACTIVE);
+            final SortedSet<InstallTask> s = getTasks(r, c);
+            assertEquals("Expected one task", 1, s.size());
+            assertTrue("Expected a BundleUpdateTask", s.first() instanceof BundleUpdateTask);
+        }
+    }
+
+    @Test
     public void testBundleRemoveSingle() throws IOException {
         final String version = "1.0";
         final MockBundleResource[] r = {new MockBundleResource(SN, version)};
