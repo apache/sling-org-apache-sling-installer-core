@@ -18,12 +18,14 @@
  */
 package org.apache.sling.installer.core.impl.tasks;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.security.cert.X509Certificate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.sling.installer.api.InstallableResource;
 import org.apache.sling.installer.api.tasks.ChangeStateTask;
@@ -32,17 +34,15 @@ import org.apache.sling.installer.api.tasks.ResourceState;
 import org.apache.sling.installer.api.tasks.TaskResource;
 import org.apache.sling.installer.core.impl.EntityResourceList;
 import org.apache.sling.installer.core.impl.MockBundleResource;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleException;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.startlevel.BundleStartLevel;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 public class BundleTaskCreatorTest {
     public static final String SN = "TestSymbolicName";
@@ -408,166 +408,16 @@ public class BundleTaskCreatorTest {
     }
 
     private Bundle getMockBundle(long bundleId, String symbolicName, Integer startLevel) {
-        return new Bundle() {
-            @Override
-            public int getState() {
-                return 0;
-            }
-
-            @Override
-            public void start(int i) throws BundleException {}
-
-            @Override
-            public void start() throws BundleException {}
-
-            @Override
-            public void stop(int i) throws BundleException {}
-
-            @Override
-            public void stop() throws BundleException {}
-
-            @Override
-            public void update(InputStream inputStream) throws BundleException {}
-
-            @Override
-            public void update() throws BundleException {}
-
-            @Override
-            public void uninstall() throws BundleException {}
-
-            @Override
-            public Dictionary<String, String> getHeaders() {
-                return null;
-            }
-
-            @Override
-            public long getBundleId() {
-                return bundleId;
-            }
-
-            @Override
-            public String getLocation() {
-                return "";
-            }
-
-            @Override
-            public ServiceReference<?>[] getRegisteredServices() {
-                return new ServiceReference[0];
-            }
-
-            @Override
-            public ServiceReference<?>[] getServicesInUse() {
-                return new ServiceReference[0];
-            }
-
-            @Override
-            public boolean hasPermission(Object o) {
-                return false;
-            }
-
-            @Override
-            public URL getResource(String s) {
-                return null;
-            }
-
-            @Override
-            public Dictionary<String, String> getHeaders(String s) {
-                return null;
-            }
-
-            @Override
-            public String getSymbolicName() {
-                return symbolicName;
-            }
-
-            @Override
-            public Class<?> loadClass(String s) throws ClassNotFoundException {
-                return null;
-            }
-
-            @Override
-            public Enumeration<URL> getResources(String s) throws IOException {
-                return null;
-            }
-
-            @Override
-            public Enumeration<String> getEntryPaths(String s) {
-                return null;
-            }
-
-            @Override
-            public URL getEntry(String s) {
-                return null;
-            }
-
-            @Override
-            public long getLastModified() {
-                return 0;
-            }
-
-            @Override
-            public Enumeration<URL> findEntries(String s, String s1, boolean b) {
-                return null;
-            }
-
-            @Override
-            public BundleContext getBundleContext() {
-                return null;
-            }
-
-            @Override
-            public Map<X509Certificate, List<X509Certificate>> getSignerCertificates(int i) {
-                return null;
-            }
-
-            @Override
-            public org.osgi.framework.Version getVersion() {
-                return null;
-            }
-
-            @Override
-            public <A> A adapt(Class<A> aClass) {
-                if (startLevel == null) {
-                    return null;
-                }
-                if (aClass == BundleStartLevel.class) {
-                    return aClass.cast(new BundleStartLevel() {
-                        @Override
-                        public Bundle getBundle() {
-                            return null;
-                        }
-
-                        @Override
-                        public int getStartLevel() {
-                            return startLevel;
-                        }
-
-                        @Override
-                        public void setStartLevel(int i) {}
-
-                        @Override
-                        public boolean isPersistentlyStarted() {
-                            return false;
-                        }
-
-                        @Override
-                        public boolean isActivationPolicyUsed() {
-                            return false;
-                        }
-                    });
-                }
-                return null;
-            }
-
-            @Override
-            public File getDataFile(String s) {
-                return null;
-            }
-
-            @Override
-            public int compareTo(@NotNull Bundle o) {
-                return 0;
-            }
-        };
+        // Create a mock bundle with the specified symbolic name and start level
+        Bundle bundle = Mockito.mock(Bundle.class);
+        when(bundle.getSymbolicName()).thenReturn(symbolicName);
+        when(bundle.getBundleId()).thenReturn(bundleId);
+        when(bundle.getState()).thenReturn(Bundle.ACTIVE);
+        if (startLevel != null) {
+            BundleStartLevel bundleStartLevel = Mockito.mock(BundleStartLevel.class);
+            when(bundleStartLevel.getStartLevel()).thenReturn(startLevel);
+            when(bundle.adapt(BundleStartLevel.class)).thenReturn(bundleStartLevel);
+        }
+        return bundle;
     }
 }
