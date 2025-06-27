@@ -22,9 +22,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 
 import org.osgi.framework.Bundle;
@@ -42,6 +44,18 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.Version;
 
 public class MockBundleContext implements BundleContext {
+
+    private final List<Bundle> bundles = new ArrayList<>();
+
+    public MockBundleContext() {
+        // Default constructor
+    }
+
+    public MockBundleContext(final List<Bundle> bundleList) {
+        if (bundleList != null) {
+            this.bundles.addAll(bundleList);
+        }
+    }
 
     @Override
     public boolean ungetService(ServiceReference reference) {
@@ -134,13 +148,16 @@ public class MockBundleContext implements BundleContext {
 
     @Override
     public Bundle[] getBundles() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.bundles.toArray(new Bundle[0]);
     }
 
     @Override
     public Bundle getBundle(long id) {
-        // TODO Auto-generated method stub
+        for (Bundle bundle : this.bundles) {
+            if (bundle.getBundleId() == id) {
+                return bundle;
+            }
+        }
         return null;
     }
 

@@ -336,7 +336,7 @@ public class BundleTaskCreator implements InternalService, InstallTaskFactory, F
      * @param info the bundle info, may be null if bundle is not installed
      * @return the current start level, or 0 if not available
      */
-    protected int getCurrentBundleStartLevel(final BundleInfo info) {
+    private int getCurrentBundleStartLevel(final BundleInfo info) {
         final int FALLBACK_START_LEVEL = 0;
         if (info == null) {
             return FALLBACK_START_LEVEL;
@@ -361,11 +361,8 @@ public class BundleTaskCreator implements InternalService, InstallTaskFactory, F
      * @param toActivate the task resource containing installation hints
      * @return the new start level
      */
-    protected int getNewBundleStartLevel(final TaskResource toActivate) {
+    private int getNewBundleStartLevel(final TaskResource toActivate) {
         final int FALLBACK_START_LEVEL = 0;
-        if (toActivate == null) {
-            return FALLBACK_START_LEVEL;
-        }
         final Object installationHint = toActivate.getDictionary().get(InstallableResource.INSTALLATION_HINT);
         if (installationHint == null) {
             return FALLBACK_START_LEVEL;

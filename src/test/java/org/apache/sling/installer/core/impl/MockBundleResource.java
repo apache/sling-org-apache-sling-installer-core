@@ -21,6 +21,7 @@ package org.apache.sling.installer.core.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
@@ -44,6 +45,7 @@ public class MockBundleResource implements TaskResource, Comparable<MockBundleRe
     private ResourceState state = ResourceState.INSTALL;
     private final String digest;
     private final int priority;
+    private final Dictionary<String, Object> dictionary = new Hashtable<>();
 
     public MockBundleResource(String symbolicName, String version) {
         this(symbolicName, version, InstallableResource.DEFAULT_PRIORITY);
@@ -61,6 +63,15 @@ public class MockBundleResource implements TaskResource, Comparable<MockBundleRe
         attributes.put(Constants.BUNDLE_VERSION, version);
         this.digest = digest;
         this.priority = priority;
+    }
+
+    public void setDictionary(Dictionary<String, Object> dictionary) {
+        Enumeration<String> keys = dictionary.keys();
+        while (keys.hasMoreElements()) {
+            String key = keys.nextElement();
+            Object value = dictionary.get(key);
+            this.dictionary.put(key, value);
+        }
     }
 
     @Override
@@ -83,7 +94,7 @@ public class MockBundleResource implements TaskResource, Comparable<MockBundleRe
      * @see org.apache.sling.installer.api.tasks.RegisteredResource#getDictionary()
      */
     public Dictionary<String, Object> getDictionary() {
-        return null;
+        return dictionary;
     }
 
     /**
@@ -211,7 +222,7 @@ public class MockBundleResource implements TaskResource, Comparable<MockBundleRe
         final InstallableResource is = new InstallableResource(
                 (String) this.attributes.get(Constants.BUNDLE_SYMBOLICNAME),
                 null,
-                new Hashtable<String, Object>(),
+                getDictionary(),
                 this.getDigest(),
                 this.getType(),
                 this.getPriority());

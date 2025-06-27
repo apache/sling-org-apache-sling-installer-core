@@ -18,43 +18,29 @@
  */
 package org.apache.sling.installer.core.impl.tasks;
 
-import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.apache.sling.installer.api.tasks.TaskResource;
 import org.apache.sling.installer.core.impl.MockBundleContext;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
 /** BundleTaskCreator that simulates the presence and state of bundles */
 class MockBundleTaskCreator extends BundleTaskCreator {
 
     private final Map<String, BundleInfo> fakeBundleInfo = new HashMap<String, BundleInfo>();
-    private final int currentStartLevel;
-    private final int newStartLevel;
 
-    public MockBundleTaskCreator() throws IOException {
-        this(20, 20);
+    public MockBundleTaskCreator() {
+        this.init(new MockBundleContext(), null, null);
     }
 
-    public MockBundleTaskCreator(int currentStartLevel, int newStartLevel) {
-        this.init(new MockBundleContext(), null, null);
-        this.currentStartLevel = currentStartLevel;
-        this.newStartLevel = newStartLevel;
+    public MockBundleTaskCreator(final List<Bundle> bundles) {
+        this.init(new MockBundleContext(bundles), null, null);
     }
 
     void addBundleInfo(String symbolicName, String version, int state) {
         fakeBundleInfo.put(symbolicName, new BundleInfo(symbolicName, new Version(version), state, 1));
-    }
-
-    @Override
-    protected int getNewBundleStartLevel(final TaskResource toActivate) {
-        return newStartLevel;
-    }
-
-    @Override
-    protected int getCurrentBundleStartLevel(final BundleInfo info) {
-        return currentStartLevel;
     }
 
     @Override

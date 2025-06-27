@@ -18,19 +18,27 @@
  */
 package org.apache.sling.installer.core.impl.tasks;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.io.InputStream;
+import java.net.URL;
+import java.security.cert.X509Certificate;
+import java.util.*;
 
+import org.apache.sling.installer.api.InstallableResource;
 import org.apache.sling.installer.api.tasks.ChangeStateTask;
 import org.apache.sling.installer.api.tasks.InstallTask;
 import org.apache.sling.installer.api.tasks.ResourceState;
 import org.apache.sling.installer.api.tasks.TaskResource;
 import org.apache.sling.installer.core.impl.EntityResourceList;
 import org.apache.sling.installer.core.impl.MockBundleResource;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
+import org.osgi.framework.ServiceReference;
+import org.osgi.framework.startlevel.BundleStartLevel;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -142,19 +150,6 @@ public class BundleTaskCreatorTest {
     }
 
     @Test
-    public void testBundleUpgradeStartLevelChanged() throws IOException {
-        final TaskResource[] r = {new MockBundleResource(SN, "1.1")};
-
-        {
-            final MockBundleTaskCreator c = new MockBundleTaskCreator(20, 19);
-            c.addBundleInfo(SN, "1.1", Bundle.ACTIVE);
-            final SortedSet<InstallTask> s = getTasks(r, c);
-            assertEquals("Expected one task", 1, s.size());
-            assertTrue("Expected a BundleUpdateTask", s.first() instanceof BundleUpdateTask);
-        }
-    }
-
-    @Test
     public void testBundleRemoveSingle() throws IOException {
         final String version = "1.0";
         final MockBundleResource[] r = {new MockBundleResource(SN, version)};
@@ -217,5 +212,362 @@ public class BundleTaskCreatorTest {
                     r[1].getEntityId(),
                     t.getResource().getEntityId());
         }
+    }
+
+    @Test
+    public void testBundleUpgradeStartLevelChanged() throws IOException {
+        Dictionary<String, Object> dictionary = new Hashtable<>();
+        dictionary.put(InstallableResource.INSTALLATION_HINT, 19);
+        final MockBundleResource resource = new MockBundleResource(SN, "1.1");
+        resource.setDictionary(dictionary);
+        final TaskResource[] r = {resource};
+
+        {
+            final long bundleId = 1L;
+            List<Bundle> bundles = new ArrayList<>();
+            bundles.add(getMockBundle(bundleId, SN, 20));
+            final MockBundleTaskCreator c = new MockBundleTaskCreator(bundles);
+            c.addBundleInfo(SN, "1.1", Bundle.ACTIVE);
+            final SortedSet<InstallTask> s = getTasks(r, c);
+            assertEquals("Expected one task", 1, s.size());
+            assertTrue("Expected a BundleUpdateTask", s.first() instanceof BundleUpdateTask);
+        }
+    }
+
+    @Test
+    public void testBundleUpgradeStartLevelChanged_BundleInfoNull() throws IOException {
+        Dictionary<String, Object> dictionary = new Hashtable<>();
+        dictionary.put(InstallableResource.INSTALLATION_HINT, 19);
+        final MockBundleResource resource = new MockBundleResource(SN, "1.1");
+        resource.setDictionary(dictionary);
+        final TaskResource[] r = {resource};
+
+        {
+            final long bundleId = 1L;
+            List<Bundle> bundles = new ArrayList<>();
+            bundles.add(getMockBundle(bundleId, SN, 20));
+            final MockBundleTaskCreator c = new MockBundleTaskCreator(bundles);
+            // Don't add bundle info, so getBundleInfo will return null
+            final SortedSet<InstallTask> s = getTasks(r, c);
+            assertEquals("Expected one task", 1, s.size());
+            assertTrue("Expected a BundleInstallTask", s.first() instanceof BundleInstallTask);
+        }
+    }
+
+    @Test
+    public void testBundleUpgradeStartLevelChanged_BundleNotFoundInContext() throws IOException {
+        Dictionary<String, Object> dictionary = new Hashtable<>();
+        dictionary.put(InstallableResource.INSTALLATION_HINT, 19);
+        final MockBundleResource resource = new MockBundleResource(SN, "1.1");
+        resource.setDictionary(dictionary);
+        final TaskResource[] r = {resource};
+
+        {
+            final MockBundleTaskCreator c = new MockBundleTaskCreator(); // Empty bundle list
+            c.addBundleInfo(SN, "1.0", Bundle.ACTIVE);
+            final SortedSet<InstallTask> s = getTasks(r, c);
+            assertEquals("Expected one task", 1, s.size());
+            // When bundle info exists with same version, it creates a ChangeStateTask
+            assertTrue("Expected a BundleUpdateTask", s.first() instanceof BundleUpdateTask);
+        }
+    }
+
+    @Test
+    public void testBundleUpgradeStartLevelChanged_BundleStartLevelServiceNull() throws IOException {
+        Dictionary<String, Object> dictionary = new Hashtable<>();
+        dictionary.put(InstallableResource.INSTALLATION_HINT, 19);
+        final MockBundleResource resource = new MockBundleResource(SN, "1.1");
+        resource.setDictionary(dictionary);
+        final TaskResource[] r = {resource};
+
+        {
+            final long bundleId = 1L;
+            List<Bundle> bundles = new ArrayList<>();
+            // Simulate bundle found but no BundleStartLevel service available
+            bundles.add(getMockBundle(bundleId, SN, null));
+            final MockBundleTaskCreator c = new MockBundleTaskCreator(bundles);
+            c.addBundleInfo(SN, "1.1", Bundle.ACTIVE);
+            final SortedSet<InstallTask> s = getTasks(r, c);
+            assertEquals("Expected one task", 1, s.size());
+            assertTrue("Expected a BundleUpdateTask", s.first() instanceof BundleUpdateTask);
+        }
+    }
+
+    @Test
+    public void testBundleUpgradeStartLevelChanged_NoInstallationHint() throws IOException {
+        final TaskResource[] r = {new MockBundleResource(SN, "1.1")};
+
+        {
+            final long bundleId = 1L;
+            List<Bundle> bundles = new ArrayList<>();
+            bundles.add(getMockBundle(bundleId, SN, 20));
+            final MockBundleTaskCreator c = new MockBundleTaskCreator(bundles);
+            c.addBundleInfo(SN, "1.1", Bundle.ACTIVE);
+            final SortedSet<InstallTask> s = getTasks(r, c);
+            assertEquals("Expected one task", 1, s.size());
+            assertTrue("Expected a BundleUpdateTask", s.first() instanceof BundleUpdateTask);
+        }
+    }
+
+    @Test
+    public void testBundleUpgradeStartLevelChanged_InstallationHintNull() throws IOException {
+        final MockBundleResource resource = new MockBundleResource(SN, "1.1");
+        resource.setDictionary(new Hashtable<>());
+        final TaskResource[] r = {resource};
+
+        {
+            final long bundleId = 1L;
+            List<Bundle> bundles = new ArrayList<>();
+            bundles.add(getMockBundle(bundleId, SN, 20));
+            final MockBundleTaskCreator c = new MockBundleTaskCreator(bundles);
+            c.addBundleInfo(SN, "1.1", Bundle.ACTIVE);
+            final SortedSet<InstallTask> s = getTasks(r, c);
+            assertEquals("Expected one task", 1, s.size());
+            assertTrue("Expected a BundleUpdateTask", s.first() instanceof BundleUpdateTask);
+        }
+    }
+
+    @Test
+    public void testBundleUpgradeStartLevelChanged_InvalidInstallationHint() throws IOException {
+        Dictionary<String, Object> dictionary = new Hashtable<>();
+        dictionary.put(InstallableResource.INSTALLATION_HINT, "NOT_A_NUMBER");
+        final MockBundleResource resource = new MockBundleResource(SN, "1.1");
+        resource.setDictionary(dictionary);
+        final TaskResource[] r = {resource};
+
+        {
+            final long bundleId = 1L;
+            List<Bundle> bundles = new ArrayList<>();
+            bundles.add(getMockBundle(bundleId, SN, 20));
+            final MockBundleTaskCreator c = new MockBundleTaskCreator(bundles);
+            c.addBundleInfo(SN, "1.1", Bundle.ACTIVE);
+            final SortedSet<InstallTask> s = getTasks(r, c);
+            assertEquals("Expected one task", 1, s.size());
+            assertTrue("Expected a BundleUpdateTask", s.first() instanceof BundleUpdateTask);
+        }
+    }
+
+    @Test
+    public void testBundleUpgradeStartLevelChanged_InstallationHintAsString() throws IOException {
+        Dictionary<String, Object> dictionary = new Hashtable<>();
+        dictionary.put(InstallableResource.INSTALLATION_HINT, "19");
+        final MockBundleResource resource = new MockBundleResource(SN, "1.1");
+        resource.setDictionary(dictionary);
+        final TaskResource[] r = {resource};
+
+        {
+            final long bundleId = 1L;
+            List<Bundle> bundles = new ArrayList<>();
+            bundles.add(getMockBundle(bundleId, SN, 20));
+            final MockBundleTaskCreator c = new MockBundleTaskCreator(bundles);
+            c.addBundleInfo(SN, "1.1", Bundle.ACTIVE);
+            final SortedSet<InstallTask> s = getTasks(r, c);
+            assertEquals("Expected one task", 1, s.size());
+            assertTrue("Expected a BundleUpdateTask", s.first() instanceof BundleUpdateTask);
+        }
+    }
+
+    @Test
+    public void testBundleUpdateWithStartLevelChange_CurrentLowerThanNew() throws IOException {
+        Dictionary<String, Object> dictionary = new Hashtable<>();
+        dictionary.put(InstallableResource.INSTALLATION_HINT, 20);
+        final MockBundleResource resource = new MockBundleResource(SN, "1.1");
+        resource.setDictionary(dictionary);
+        final TaskResource[] r = {resource};
+
+        {
+            final long bundleId = 1L;
+            List<Bundle> bundles = new ArrayList<>();
+            bundles.add(getMockBundle(bundleId, SN, 19));
+            final MockBundleTaskCreator c = new MockBundleTaskCreator(bundles);
+            c.addBundleInfo(SN, "1.1", Bundle.ACTIVE);
+            final SortedSet<InstallTask> s = getTasks(r, c);
+            assertEquals("Expected one task", 1, s.size());
+            assertTrue("Expected a BundleUpdateTask", s.first() instanceof BundleUpdateTask);
+        }
+    }
+
+    @Test
+    public void testBundleUpdateWithStartLevelChange_SameStartLevel() throws IOException {
+        Dictionary<String, Object> dictionary = new Hashtable<>();
+        dictionary.put(InstallableResource.INSTALLATION_HINT, 20);
+        final MockBundleResource resource = new MockBundleResource(SN, "1.1");
+        resource.setDictionary(dictionary);
+        final TaskResource[] r = {resource};
+
+        {
+            final long bundleId = 1L;
+            List<Bundle> bundles = new ArrayList<>();
+            bundles.add(getMockBundle(bundleId, SN, 20));
+            final MockBundleTaskCreator c = new MockBundleTaskCreator(bundles);
+            c.addBundleInfo(SN, "1.1", Bundle.ACTIVE);
+            final SortedSet<InstallTask> s = getTasks(r, c);
+            assertEquals("Expected one task", 1, s.size());
+            assertTrue("Expected a ChangeStateTask", s.first() instanceof ChangeStateTask);
+        }
+    }
+
+    private Bundle getMockBundle(long bundleId, String symbolicName, Integer startLevel) {
+        return new Bundle() {
+            @Override
+            public int getState() {
+                return 0;
+            }
+
+            @Override
+            public void start(int i) throws BundleException {}
+
+            @Override
+            public void start() throws BundleException {}
+
+            @Override
+            public void stop(int i) throws BundleException {}
+
+            @Override
+            public void stop() throws BundleException {}
+
+            @Override
+            public void update(InputStream inputStream) throws BundleException {}
+
+            @Override
+            public void update() throws BundleException {}
+
+            @Override
+            public void uninstall() throws BundleException {}
+
+            @Override
+            public Dictionary<String, String> getHeaders() {
+                return null;
+            }
+
+            @Override
+            public long getBundleId() {
+                return bundleId;
+            }
+
+            @Override
+            public String getLocation() {
+                return "";
+            }
+
+            @Override
+            public ServiceReference<?>[] getRegisteredServices() {
+                return new ServiceReference[0];
+            }
+
+            @Override
+            public ServiceReference<?>[] getServicesInUse() {
+                return new ServiceReference[0];
+            }
+
+            @Override
+            public boolean hasPermission(Object o) {
+                return false;
+            }
+
+            @Override
+            public URL getResource(String s) {
+                return null;
+            }
+
+            @Override
+            public Dictionary<String, String> getHeaders(String s) {
+                return null;
+            }
+
+            @Override
+            public String getSymbolicName() {
+                return symbolicName;
+            }
+
+            @Override
+            public Class<?> loadClass(String s) throws ClassNotFoundException {
+                return null;
+            }
+
+            @Override
+            public Enumeration<URL> getResources(String s) throws IOException {
+                return null;
+            }
+
+            @Override
+            public Enumeration<String> getEntryPaths(String s) {
+                return null;
+            }
+
+            @Override
+            public URL getEntry(String s) {
+                return null;
+            }
+
+            @Override
+            public long getLastModified() {
+                return 0;
+            }
+
+            @Override
+            public Enumeration<URL> findEntries(String s, String s1, boolean b) {
+                return null;
+            }
+
+            @Override
+            public BundleContext getBundleContext() {
+                return null;
+            }
+
+            @Override
+            public Map<X509Certificate, List<X509Certificate>> getSignerCertificates(int i) {
+                return null;
+            }
+
+            @Override
+            public org.osgi.framework.Version getVersion() {
+                return null;
+            }
+
+            @Override
+            public <A> A adapt(Class<A> aClass) {
+                if (startLevel == null) {
+                    return null;
+                }
+                if (aClass == BundleStartLevel.class) {
+                    return aClass.cast(new BundleStartLevel() {
+                        @Override
+                        public Bundle getBundle() {
+                            return null;
+                        }
+
+                        @Override
+                        public int getStartLevel() {
+                            return startLevel;
+                        }
+
+                        @Override
+                        public void setStartLevel(int i) {}
+
+                        @Override
+                        public boolean isPersistentlyStarted() {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean isActivationPolicyUsed() {
+                            return false;
+                        }
+                    });
+                }
+                return null;
+            }
+
+            @Override
+            public File getDataFile(String s) {
+                return null;
+            }
+
+            @Override
+            public int compareTo(@NotNull Bundle o) {
+                return 0;
+            }
+        };
     }
 }
