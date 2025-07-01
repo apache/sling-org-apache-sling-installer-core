@@ -37,6 +37,7 @@ import org.apache.sling.installer.core.impl.OsgiInstallerImpl;
 import org.apache.sling.installer.core.impl.PersistentResourceList;
 import org.apache.sling.installer.core.impl.RegisteredResourceImpl;
 import org.apache.sling.installer.core.impl.Util;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
@@ -44,6 +45,7 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.FrameworkListener;
 import org.osgi.framework.Version;
+import org.osgi.framework.startlevel.BundleStartLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -259,6 +261,8 @@ public class BundleTaskCreator implements InternalService, InstallTaskFactory, F
                     }
 
                     final BundleInfo info = this.getBundleInfo(symbolicName, bundleVersion);
+                    final int currentStartLevel = getCurrentBundleStartLevel(info);
+                    final int newStartLevel = getNewBundleStartLevel(toActivate);
 
                     // check if we should start the bundle as we installed it in the previous run
                     if (info == null) {
@@ -281,7 +285,8 @@ public class BundleTaskCreator implements InternalService, InstallTaskFactory, F
                                 logger.debug("Bundle " + info.symbolicName + " " + newVersion
                                         + " is not installed, bundle with higher version is already installed.");
                             }
-                        } else if (compare == 0 && BundleInfo.isSnapshot(newVersion)) {
+                        } else if (compare == 0
+                                && (BundleInfo.isSnapshot(newVersion) || currentStartLevel != newStartLevel)) {
 
                             // installed, same version but SNAPSHOT
                             doUpdate = true;
@@ -323,5 +328,51 @@ public class BundleTaskCreator implements InternalService, InstallTaskFactory, F
 
     protected BundleInfo getBundleInfo(final String symbolicName, final String version) {
         return BundleInfo.getBundleInfo(this.bundleContext, symbolicName, version);
+    }
+
+    /**
+     * Gets the current start level of a bundle.
+     *
+     * @param info the bundle info, may be null if bundle is not installed
+     * @return the current start level, or 0 if not available
+     */
+    private int getCurrentBundleStartLevel(final BundleInfo info) {
+        final int FALLBACK_START_LEVEL = 0;
+        if (info == null) {
+            return FALLBACK_START_LEVEL;
+        }
+
+        final Bundle currentBundle = this.bundleContext.getBundle(info.id);
+        if (currentBundle == null) {
+            return FALLBACK_START_LEVEL;
+        }
+
+        final BundleStartLevel bundleStartLevel = currentBundle.adapt(BundleStartLevel.class);
+        if (bundleStartLevel == null) {
+            return FALLBACK_START_LEVEL;
+        }
+
+        return bundleStartLevel.getStartLevel();
+    }
+
+    /**
+     * Gets the new start level for a bundle from the installation hint.
+     *
+     * @param toActivate the task resource containing installation hints
+     * @return the new start level
+     */
+    private int getNewBundleStartLevel(final TaskResource toActivate) {
+        final int FALLBACK_START_LEVEL = 0;
+        final Object installationHint = toActivate.getDictionary().get(InstallableResource.INSTALLATION_HINT);
+        if (installationHint == null) {
+            return FALLBACK_START_LEVEL;
+        }
+
+        try {
+            return Integer.parseInt(installationHint.toString());
+        } catch (NumberFormatException e) {
+            logger.warn("Invalid installation hint value '{}' for bundle {}", installationHint, toActivate.getURL());
+            return FALLBACK_START_LEVEL;
+        }
     }
 }

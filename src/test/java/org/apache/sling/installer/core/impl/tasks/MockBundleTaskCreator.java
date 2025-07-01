@@ -18,11 +18,12 @@
  */
 package org.apache.sling.installer.core.impl.tasks;
 
-import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.sling.installer.core.impl.MockBundleContext;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
 /** BundleTaskCreator that simulates the presence and state of bundles */
@@ -30,8 +31,12 @@ class MockBundleTaskCreator extends BundleTaskCreator {
 
     private final Map<String, BundleInfo> fakeBundleInfo = new HashMap<String, BundleInfo>();
 
-    public MockBundleTaskCreator() throws IOException {
+    public MockBundleTaskCreator() {
         this.init(new MockBundleContext(), null, null);
+    }
+
+    public MockBundleTaskCreator(final List<Bundle> bundles) {
+        this.init(new MockBundleContext(bundles), null, null);
     }
 
     void addBundleInfo(String symbolicName, String version, int state) {

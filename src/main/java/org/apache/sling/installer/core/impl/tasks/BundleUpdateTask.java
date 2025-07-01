@@ -79,7 +79,10 @@ public class BundleUpdateTask extends AbstractBundleTask {
         boolean snapshot = false;
         final Version currentVersion = b.getVersion();
         snapshot = BundleInfo.isSnapshot(newVersion);
-        if (currentVersion.equals(newVersion) && !snapshot) {
+        final BundleStartLevel startLevelService = b.adapt(BundleStartLevel.class);
+        final int newStartLevel = this.getBundleStartLevel();
+        final int oldStartLevel = startLevelService.getStartLevel();
+        if (currentVersion.equals(newVersion) && !snapshot && newStartLevel == oldStartLevel) {
             // TODO : Isn't this already checked in the task creator?
             String message = MessageFormat.format(
                     "Same version is already installed, and not a snapshot, ignoring update: {0}", getResource());
@@ -105,9 +108,6 @@ public class BundleUpdateTask extends AbstractBundleTask {
             setBundleLocation(getResource(), b.getLocation());
             // start level handling - after update to avoid starting the bundle
             // just before the update
-            final BundleStartLevel startLevelService = b.adapt(BundleStartLevel.class);
-            final int newStartLevel = this.getBundleStartLevel();
-            final int oldStartLevel = startLevelService.getStartLevel();
             if (newStartLevel != oldStartLevel && newStartLevel != 0) {
                 startLevelService.setStartLevel(newStartLevel);
                 ctx.log("Set start level for bundle {} to {}", b, newStartLevel);
