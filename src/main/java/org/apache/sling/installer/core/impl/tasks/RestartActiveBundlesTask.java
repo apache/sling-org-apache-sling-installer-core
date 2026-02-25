@@ -68,7 +68,10 @@ public class RestartActiveBundlesTask extends AbstractInstallTask {
             final Set<Long> remove = new HashSet<Long>();
             for (final Long id : ids) {
                 final Bundle bundle = this.getBundleContext().getBundle(id);
-                if (bundle != null
+                if (bundle != null && BundleUtil.getFragmentHostHeader(bundle) != null) {
+                    getLogger().info("Bundle {} is a fragment, skipping restart and removing from task", bundle);
+                    remove.add(id);
+                } else if (bundle != null
                         && bundle.getState() != Bundle.ACTIVE
                         && bundle.getState() != Bundle.STARTING
                         && bundle.getState() != Bundle.STOPPING
